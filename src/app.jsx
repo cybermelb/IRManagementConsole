@@ -98,9 +98,9 @@ const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen, toggleSidebar }) => {
 
       {/* Sidebar - Desktop and Mobile Overlay */}
       <div 
-        className={\`fixed top-0 left-0 h-full bg-gray-900 text-white z-40 transition-all duration-300 md:relative md:translate-x-0 md:w-64 flex-shrink-0 ${
+        className={`fixed top-0 left-0 h-full bg-gray-900 text-white z-40 transition-all duration-300 md:relative md:translate-x-0 md:w-64 flex-shrink-0 ${
           isSidebarOpen ? 'translate-x-0 w-64 shadow-2xl' : '-translate-x-full w-0 md:w-64'
-        }\`}
+        }`}
       >
         <div className="p-4 pt-6 flex flex-col h-full">
           <h1 className="text-2xl font-bold font-mono tracking-tighter text-indigo-400 mb-6 flex items-center">
@@ -115,11 +115,11 @@ const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen, toggleSidebar }) => {
                 <button
                   key={tab.id}
                   onClick={() => handleTabClick(tab.id)}
-                  className={\`flex items-center w-full space-x-3 p-3 rounded-xl text-sm transition duration-200 ease-in-out ${
+                  className={`flex items-center w-full space-x-3 p-3 rounded-xl text-sm transition duration-200 ease-in-out ${
                     isActive
                       ? 'bg-indigo-600 text-white font-semibold shadow-md'
                       : 'text-gray-300 hover:bg-gray-800 hover:text-indigo-400'
-                  }\`}
+                  }`}
                 >
                   <Icon className="h-5 w-5" />
                   <span>{tab.label}</span>
@@ -166,14 +166,14 @@ const DashboardPage = ({ onSelectIncident, currentIncident }) => {
         {metricCards.map(card => {
           const Icon = card.icon;
           return (
-            <div key={card.title} className={\`p-5 rounded-xl shadow-lg bg-white border-t-4 border-${card.color}-500\`}>
+            <div key={card.title} className={`p-5 rounded-xl shadow-lg bg-white border-t-4 border-${card.color}-500`}>
               <div className="flex justify-between items-center">
                 <p className="text-sm font-medium text-gray-500">{card.title}</p>
-                <Icon className={\`w-5 h-5 text-${card.color}-500\`} />
+                <Icon className={`w-5 h-5 text-${card.color}-500`} />
               </div>
               <p className="text-3xl font-extrabold text-gray-900 mt-1">{card.value}</p>
-              <div className={\`mt-2 text-xs font-semibold text-green-600 flex items-center\`}>
-                 <span className={\`text-${card.color}-600\`}>{card.change}</span> vs Last Quarter
+              <div className={`mt-2 text-xs font-semibold text-green-600 flex items-center`}>
+                 <span className={`text-${card.color}-600`}>{card.change}</span> vs Last Quarter
               </div>
             </div>
           );
@@ -181,7 +181,7 @@ const DashboardPage = ({ onSelectIncident, currentIncident }) => {
       </div>
       
       {/* Current Incident Banner */}
-      <div className={\`p-5 rounded-xl border-l-4 ${getSeverityColor(currentIncident.severity)} shadow-md\`}>
+      <div className={`p-5 rounded-xl border-l-4 ${getSeverityColor(currentIncident.severity)} shadow-md`}>
         <p className="font-semibold flex items-center mb-1"><AlertTriangle className="w-5 h-5 mr-2" /> Active Incident:</p>
         <p className="text-2xl font-bold">{currentIncident.title}</p>
         <p className="text-sm">Status: <span className="font-semibold">{currentIncident.status}</span> | Severity: <span className="font-semibold">{currentIncident.severity}</span></p>
@@ -192,9 +192,9 @@ const DashboardPage = ({ onSelectIncident, currentIncident }) => {
         {initialScenarios.map(incident => (
           <div
             key={incident.id}
-            className={\`flex justify-between items-center p-4 rounded-lg shadow-md transition ${
+            className={`flex justify-between items-center p-4 rounded-lg shadow-md transition ${
               incident.id === currentIncident.id ? 'bg-indigo-100 ring-2 ring-indigo-500' : 'bg-white hover:bg-gray-50 cursor-pointer'
-            }\`}
+            }`}
             onClick={() => onSelectIncident(incident)}
           >
             <div>
@@ -202,7 +202,7 @@ const DashboardPage = ({ onSelectIncident, currentIncident }) => {
               <p className="text-sm text-gray-500">Last Updated: {incident.updated}</p>
             </div>
             <div className="text-right">
-              <span className={\`px-3 py-1 text-xs font-semibold rounded-full ${incident.severity === 'Critical' ? 'bg-red-200 text-red-800' : 'bg-green-200 text-green-800'}\`}>{incident.severity}</span>
+              <span className={`px-3 py-1 text-xs font-semibold rounded-full ${incident.severity === 'Critical' ? 'bg-red-200 text-red-800' : 'bg-green-200 text-green-800'}`}>{incident.severity}</span>
               <p className="text-sm font-medium mt-1">{incident.status}</p>
             </div>
           </div>
@@ -233,7 +233,7 @@ const TimelinePage = ({ currentIncident }) => {
       <div className="space-y-8 relative before:absolute before:inset-y-0 before:w-1 before:bg-gray-200 before:left-3">
         {mockTimelineEvents.map((event, index) => (
           <div key={index} className="ml-8 relative">
-            <span className={\`absolute -left-10 top-1 w-6 h-6 rounded-full ${getPhaseColor(event.phase)} ring-4 ring-white\`}></span>
+            <span className={`absolute -left-10 top-1 w-6 h-6 rounded-full ${getPhaseColor(event.phase)} ring-4 ring-white`}></span>
             <div className="p-4 bg-white rounded-lg shadow-md border-l-4 border-gray-300">
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">{event.timestamp} | {event.phase}</p>
               <p className="font-bold mt-1 text-gray-800">{event.action}</p>
@@ -462,13 +462,13 @@ const ThreatHuntingPage = () => (
       <h4 className="font-bold text-lg text-gray-800 mb-3 flex items-center"><Clock className="w-4 h-4 mr-2" /> Persistence Artifacts (Autostart Mechanisms)</h4>
       <p className="text-sm text-gray-600 mb-3">Focus on registry keys that launch processes on user login or system boot outside of standard paths.</p>
       <p className="text-sm font-mono bg-gray-100 p-3 rounded-md text-red-700 overflow-x-auto">
-        \`Registry: Run | Path !contains 'Program Files' OR Path !contains 'System32'\`
+        `Registry: Run | Path !contains 'Program Files' OR Path !contains 'System32'`
       </p>
 
       <h4 className="font-bold text-lg text-gray-800 mb-3 mt-6 flex items-center"><Users className="w-4 h-4 mr-2" /> Lateral Movement (Credential Use)</h4>
       <p className="text-sm text-gray-600 mb-3">Explicit logon events are often used in credential theft scenarios like Pass-the-Hash (PtH).</p>
       <p className="text-sm font-mono bg-gray-100 p-3 rounded-md text-red-700 overflow-x-auto">
-        \`EventCode=4648\` (A logon was attempted using explicit credentials)
+        `EventCode=4648` (A logon was attempted using explicit credentials)
       </p>
     </div>
   </div>
@@ -527,7 +527,7 @@ const RiskDashboardPage = () => {
               <div key={i} className="flex justify-between items-center">
                 <span className="text-gray-700">{r.name}</span>
                 <div className="flex items-center space-x-2">
-                  <span className={\`px-3 py-1 text-xs font-bold rounded-full text-white ${r.color}\`}>{r.score.toFixed(1)}</span>
+                  <span className={`px-3 py-1 text-xs font-bold rounded-full text-white ${r.color}`}>{r.score.toFixed(1)}</span>
                 </div>
               </div>
             ))}
@@ -637,7 +637,7 @@ const IncidentBuilderPage = () => {
               <tr key={inc.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{inc.title}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={\`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${inc.severity === 'Critical' ? 'bg-red-100 text-red-800' : inc.severity === 'High' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}\`}>
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${inc.severity === 'Critical' ? 'bg-red-100 text-red-800' : inc.severity === 'High' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
                     {inc.severity}
                   </span>
                 </td>
@@ -747,7 +747,7 @@ const AssetBuilderPage = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{asset.criticality}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{asset.owner}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={\`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getLogStatusStyle(asset.logs)}\`}>
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getLogStatusStyle(asset.logs)}`}>
                     {asset.logs}
                   </span>
                 </td>
@@ -792,8 +792,8 @@ const RemediationTasksPage = () => {
                 <p className="text-xs text-gray-500 mt-1">Source: {task.source}</p>
               </div>
               <div className="flex items-center space-x-3">
-                <span className={\`px-3 py-1 text-xs font-medium rounded-full ${getPriorityStyle(task.priority)}\`}>{task.priority}</span>
-                <span className={\`px-3 py-1 text-xs font-medium rounded-full ${getStatusStyle(task.status)}\`}>{task.status}</span>
+                <span className={`px-3 py-1 text-xs font-medium rounded-full ${getPriorityStyle(task.priority)}`}>{task.priority}</span>
+                <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusStyle(task.status)}`}>{task.status}</span>
                 <button className="text-gray-400 hover:text-red-500 transition"><Trash2 className="w-4 h-4" /></button>
               </div>
             </div>
@@ -818,10 +818,10 @@ const AdminDashboardPage = () => {
         {metrics.map(card => {
           const Icon = card.icon;
           return (
-            <div key={card.title} className={\`p-5 rounded-xl shadow-lg bg-white border-b-4 border-${card.color}-500\`}>
+            <div key={card.title} className={`p-5 rounded-xl shadow-lg bg-white border-b-4 border-${card.color}-500`}>
               <div className="flex justify-between items-center">
                 <p className="text-sm font-medium text-gray-500">{card.title}</p>
-                <Icon className={\`w-5 h-5 text-${card.color}-500\`} />
+                <Icon className={`w-5 h-5 text-${card.color}-500`} />
               </div>
               <p className="text-3xl font-extrabold text-gray-900 mt-1">{card.value}</p>
             </div>
