@@ -21,7 +21,7 @@ const useFirebase = () => {
     // Mock Initialization
     if (firebaseConfig) {
       console.log("Mock Firebase: Initializing...");
-      const mockUser = { uid: \`user-${Math.random().toString(36).substr(2, 9)}\` };
+      const mockUser = { uid: \\`user-${Math.random().toString(36).substr(2, 9)}\\` };
       setUserId(mockUser.uid);
       console.log("Mock Firebase: Signed in successfully.");
     }
