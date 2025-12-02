@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-
+import "./index.css";
 // We are assuming a build environment (like Vercel deploying a Create React App)
 // will handle the CSS, so no explicit CSS import is needed here.
 
