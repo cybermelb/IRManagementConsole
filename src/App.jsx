@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Shield, Book, ListChecks, Target, Users, X, CheckCircle, Clock, Search, FolderOpen, 
   AlertTriangle, Cpu, Globe, Zap, Megaphone, Calendar, Phone, Grip, TrendingUp, 
-  FilePlus, ClipboardList, Database, Cog, Settings, LayoutDashboard, Menu, GitFork, FileText, 
+  FilePlus, ClipboardList, Database, Cog, Settings, LayoutDashboard, Menu, GitFork, FileText, UserPlus, 
   Plus, Trash2, Edit2, BarChart3, Server, Hash, Layers, ListTodo
 } from 'lucide-react';
 
@@ -1462,15 +1462,17 @@ const AdminDashboardPage = () => {
   const [users, setUsers] = useState(() => {
     try {
       const saved = localStorage.getItem("incidentUsers");
-      return saved ? JSON.parse(saved) : [
-        "SOC Analyst 1",
-        "SOC Analyst 2",
-        "Engineer",
-        "Threat Analyst",
-        "Incident Responder",
-        "Security Manager",
-        "Head of Security",
-      ];
+      return saved
+        ? JSON.parse(saved)
+        : [
+            "SOC Analyst 1",
+            "SOC Analyst 2",
+            "Engineer",
+            "Threat Analyst",
+            "Incident Responder",
+            "Security Manager",
+            "Head of Security",
+          ];
     } catch {
       return [];
     }
