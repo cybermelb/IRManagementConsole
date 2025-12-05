@@ -214,15 +214,110 @@ const DashboardPage = ({ onSelectIncident, currentIncident }) => {
 
 // Timeline Page
 const TimelinePage = ({ currentIncident, incomingEvents }) => {
- <div className="p-4 bg-white rounded-lg shadow-md border-l-4 border-gray-300">
-  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-    {event.timestamp} | {event.phase}
-  </p>
-  <p className="font-bold mt-1 text-gray-800">
-    {event.incidentTitle ? `${event.incidentTitle}: ${event.action}` : event.action}
-  </p>
-  <p className="text-xs text-gray-400 mt-1">Logged by: {event.user}</p>
-</div>
+  const [events, setEvents] = useState(() => {
+    // Prefer props if provided; otherwise load from localStorage; fallback to mock
+    if (incomingEvents && Array.isArray(incomingEvents) && incomingEvents.length > 0) return incomingEvents;
+    try {
+      const saved = localStorage.getItem("timelineEvents");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    // Fallback mock data
+    return [
+      {
+        timestamp: "10:00 AM (D-0)",
+        incidentTitle: "Prod-Server-01 Ransomware",
+        action: "Alert Received: EDR flagged potential ransomware activity.",
+        phase: "Identification",
+        user: "SOC Analyst 1",
+      },
+      {
+        timestamp: "10:15 AM (D-0)",
+        incidentTitle: "Prod-Server-01 Ransomware",
+        action: "Containment Action: Isolated VLAN; blocked external C2 IPs.",
+        phase: "Containment",
+        user: "IRH John D.",
+      },
+      {
+        timestamp: "11:00 AM (D-0)",
+        incidentTitle: "Prod-Server-01 Ransomware",
+        action: "Legal Counsel notified and engaged.",
+        phase: "Containment",
+        user: "PIH Sarah K.",
+      },
+    ];
+  });
+
+  // Listen for broadcasted updates from IncidentBuilderPage
+  useEffect(() => {
+    const handler = (ev) => {
+      const detail = ev.detail;
+      if (detail && detail.timestamp && detail.action) {
+        setEvents((prev) => [...prev, detail]);
+      }
+    };
+    window.addEventListener("timeline:updated", handler);
+    return () => window.removeEventListener("timeline:updated", handler);
+  }, []);
+
+  const getPhaseColor = (phase) => {
+    switch (phase) {
+      case "Identification":
+        return "bg-yellow-500";
+      case "Containment":
+        return "bg-red-500";
+      case "Eradication":
+        return "bg-orange-500";
+      case "Recovery":
+        return "bg-blue-500";
+      case "Lessons Learned":
+        return "bg-green-500";
+      default:
+        return "bg-gray-400";
+    }
+  };
+
+  return (
+    <div className="p-4 space-y-6">
+      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2">
+        Timeline for: {currentIncident?.title || "Current Incident"}
+      </h2>
+      <div className="space-y-8 relative before:absolute before:inset-y-0 before:w-1 before:bg-gray-200 before:left-3">
+        {events.map((event, index) => (
+          <div key={index} className="ml-8 relative">
+            <span
+              className={`absolute -left-10 top-1 w-6 h-6 rounded-full ${getPhaseColor(
+                event.phase
+              )} ring-4 ring-white`}
+            ></span>
+            <div className="p-4 bg-white rounded-lg shadow-md border-l-4 border-gray-300">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                {event.timestamp} | {event.phase}
+              </p>
+              <p className="font-bold mt-1 text-gray-800">
+                {event.incidentTitle ? `${event.incidentTitle}: ${event.action}` : event.action}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">Logged by: {event.user}</p>
+            </div>
+          </div>
+        ))}
+        {events.length === 0 && (
+          <div className="ml-8 p-4 bg-white rounded-lg shadow-md border">
+            <p className="text-sm text-gray-600">
+              No timeline events yet. Add actions from the Incident Builder.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
 
 
 // PICERL Checklists Page
