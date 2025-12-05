@@ -213,38 +213,77 @@ const DashboardPage = ({ onSelectIncident, currentIncident }) => {
 };
 
 // Timeline Page
-const TimelinePage = ({ currentIncident }) => {
-  const mockTimelineEvents = [
-    { timestamp: '10:00 AM (D-0)', action: 'Alert Received: EDR flagged potential ransomware activity on Prod-Server-01.', phase: 'Identification', user: 'SOC Analyst 1' },
-    { timestamp: '10:15 AM (D-0)', action: 'Containment Action: Isolated Prod-Server-01 VLAN; blocked external C2 IPs.', phase: 'Containment', user: 'IRH John D.' },
-    { timestamp: '11:00 AM (D-0)', action: 'Legal Counsel notified and engaged.', phase: 'Containment', user: 'PIH Sarah K.' },
-  ];
+const TimelinePage = ({ currentIncident, incomingEvents }) => {
+  const [events, setEvents] = useState(() => {
+    // Prefer props if provided; otherwise load from localStorage; fallback to mock
+    if (incomingEvents && Array.isArray(incomingEvents) && incomingEvents.length > 0) return incomingEvents;
+    try {
+      const saved = localStorage.getItem('timelineEvents');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    return [
+      { timestamp: '10:00 AM (D-0)', action: 'Alert Received: EDR flagged potential ransomware activity on Prod-Server-01.', phase: 'Identification', user: 'SOC Analyst 1' },
+      { timestamp: '10:15 AM (D-0)', action: 'Containment Action: Isolated Prod-Server-01 VLAN; blocked external C2 IPs.', phase: 'Containment', user: 'IRH John D.' },
+      { timestamp: '11:00 AM (D-0)', action: 'Legal Counsel notified and engaged.', phase: 'Containment', user: 'PIH Sarah K.' },
+    ];
+  });
+
+  useEffect(() => {
+    const handler = (ev) => {
+      // Optional: respond to broadcasted updates from IncidentBuilderPage
+      const detail = ev.detail;
+      if (detail && detail.timestamp && detail.action) {
+        setEvents(prev => [...prev, detail]);
+      }
+    };
+    window.addEventListener('timeline:updated', handler);
+    return () => window.removeEventListener('timeline:updated', handler);
+  }, []);
+
   const getPhaseColor = (phase) => {
-    switch(phase) {
+    switch (phase) {
       case 'Identification': return 'bg-yellow-500';
       case 'Containment': return 'bg-red-500';
       case 'Eradication': return 'bg-orange-500';
+      case 'Recovery': return 'bg-blue-500';
+      case 'Lessons Learned': return 'bg-green-500';
       default: return 'bg-gray-400';
     }
-  }
+  };
+
   return (
     <div className="p-4 space-y-6">
-      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2">Timeline for: {currentIncident.title}</h2>
+      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2">
+        Timeline for: {currentIncident?.title || 'Current Incident'}
+      </h2>
       <div className="space-y-8 relative before:absolute before:inset-y-0 before:w-1 before:bg-gray-200 before:left-3">
-        {mockTimelineEvents.map((event, index) => (
+        {events.map((event, index) => (
           <div key={index} className="ml-8 relative">
             <span className={`absolute -left-10 top-1 w-6 h-6 rounded-full ${getPhaseColor(event.phase)} ring-4 ring-white`}></span>
             <div className="p-4 bg-white rounded-lg shadow-md border-l-4 border-gray-300">
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">{event.timestamp} | {event.phase}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                {event.timestamp} | {event.phase}
+              </p>
               <p className="font-bold mt-1 text-gray-800">{event.action}</p>
               <p className="text-xs text-gray-400 mt-1">Logged by: {event.user}</p>
             </div>
           </div>
         ))}
+        {events.length === 0 && (
+          <div className="ml-8 p-4 bg-white rounded-lg shadow-md border">
+            <p className="text-sm text-gray-600">No timeline events yet. Add actions from the Incident Builder.</p>
+          </div>
+        )}
       </div>
     </div>
   );
 };
+
 
 // PICERL Checklists Page
 const ChecklistsPage = () => {
@@ -814,9 +853,24 @@ const RiskDashboardPage = () => {
 const IncidentBuilderPage = () => {
   const [newIncident, setNewIncident] = useState({ title: '', severity: 'Medium', asset: '' });
   const [incidentLog, setIncidentLog] = useState(initialScenarios);
-  const [timelineEvents, setTimelineEvents] = useState([]); // store timeline events
 
-  const [newEvent, setNewEvent] = useState({ action: '', phase: 'Identification', user: 'SOC Analyst' });
+  // Timeline events persisted so TimelinePage can read them
+  const [timelineEvents, setTimelineEvents] = useState(() => {
+    try {
+      const saved = localStorage.getItem('timelineEvents');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Form state for adding timeline actions
+  const [newEvent, setNewEvent] = useState({
+    action: '',
+    details: '',
+    phase: 'Identification',
+    user: 'SOC Analyst 1',
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -825,36 +879,63 @@ const IncidentBuilderPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newIncident.title) {
+    if (newIncident.title.trim().length > 0) {
       const newEntry = {
         id: incidentLog.length + 1,
-        title: newIncident.title,
+        title: newIncident.title.trim(),
         status: 'Identified',
         severity: newIncident.severity,
         updated: new Date().toLocaleTimeString(),
-        asset: newIncident.asset || 'N/A',
+        asset: newIncident.asset?.trim() || 'N/A',
       };
       setIncidentLog(prev => [newEntry, ...prev]);
       setNewIncident({ title: '', severity: 'Medium', asset: '' });
     }
   };
 
-  const handleEventChange = (e) => {
+  const handleEventFieldChange = (e) => {
     const { name, value } = e.target;
     setNewEvent(prev => ({ ...prev, [name]: value }));
   };
 
   const handleAddEvent = (e) => {
     e.preventDefault();
-    if (newEvent.action) {
-      const newTimelineEntry = {
-        timestamp: new Date().toLocaleTimeString(),
-        action: newEvent.action,
-        phase: newEvent.phase,
-        user: newEvent.user,
-      };
-      setTimelineEvents(prev => [...prev, newTimelineEntry]);
-      setNewEvent({ action: '', phase: 'Identification', user: 'SOC Analyst' });
+    if (!newEvent.action) return;
+
+    const timestamp = new Date().toLocaleTimeString();
+    const actionText =
+      newEvent.details && newEvent.details.trim().length > 0
+        ? `${newEvent.action}: ${newEvent.details.trim()}`
+        : newEvent.action;
+
+    const entry = {
+      timestamp,
+      action: actionText,
+      phase: newEvent.phase,
+      user: newEvent.user?.trim() || 'SOC Analyst 1',
+    };
+
+    const updated = [...timelineEvents, entry];
+    setTimelineEvents(updated);
+    try {
+      localStorage.setItem('timelineEvents', JSON.stringify(updated));
+      // Optional: broadcast to other parts of the app
+      window.dispatchEvent(new CustomEvent('timeline:updated', { detail: entry }));
+    } catch {
+      // Ignore storage errors
+    }
+
+    setNewEvent({ action: '', details: '', phase: 'Identification', user: 'SOC Analyst 1' });
+  };
+
+  const phaseBadge = (phase) => {
+    switch (phase) {
+      case 'Identification': return 'bg-yellow-100 text-yellow-800';
+      case 'Containment': return 'bg-red-100 text-red-800';
+      case 'Eradication': return 'bg-orange-100 text-orange-800';
+      case 'Recovery': return 'bg-blue-100 text-blue-800';
+      case 'Lessons Learned': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -916,62 +997,104 @@ const IncidentBuilderPage = () => {
         </form>
       </div>
 
-      {/* Incident Response Actions */}
+      {/* Incident Response Actions -> Auto to Timeline */}
       <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
-        <h3 className="text-xl font-semibold mb-4">Add Incident Response Action</h3>
+        <h3 className="text-xl font-semibold mb-4">Add Incident Response Action (auto-appends to Timeline)</h3>
         <form onSubmit={handleAddEvent} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Action</label>
-            <select
-              name="action"
-              value={newEvent.action}
-              onChange={handleEventChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-            >
-              <option value="">Select an action</option>
-              <option value="Alert Received">Alert Received</option>
-              <option value="Triage Initiated">Triage Initiated</option>
-              <option value="Incident Declared">Incident Declared</option>
-              <option value="Technology Team Notified">Technology Team Notified</option>
-              <option value="Cyber Manager Notified">Cyber Manager Notified</option>
-              <option value="Containment Action">Containment Action</option>
-              <option value="Recovery Action">Recovery Action</option>
-              <option value="Legal Counsel Notified">Legal Counsel Notified</option>
-            </select>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Action</label>
+              <select
+                name="action"
+                value={newEvent.action}
+                onChange={handleEventFieldChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+              >
+                <option value="">Select an action</option>
+                <option value="Alert Received">Alert Received</option>
+                <option value="Triage Initiated">Triage Initiated</option>
+                <option value="Incident Declared">Incident Declared</option>
+                <option value="Technology Team Notified">Technology Team Notified</option>
+                <option value="Cyber Manager Notified">Cyber Manager Notified</option>
+                <option value="Containment Action">Containment Action</option>
+                <option value="Eradication Action">Eradication Action</option>
+                <option value="Recovery Action">Recovery Action</option>
+                <option value="Legal Counsel Notified">Legal Counsel Notified</option>
+                <option value="Communications/PR Notified">Communications/PR Notified</option>
+                <option value="Regulator Notified">Regulator Notified</option>
+                <option value="Lessons Learned Workshop Scheduled">Lessons Learned Workshop Scheduled</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Phase</label>
+              <select
+                name="phase"
+                value={newEvent.phase}
+                onChange={handleEventFieldChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+              >
+                <option value="Identification">Identification</option>
+                <option value="Containment">Containment</option>
+                <option value="Eradication">Eradication</option>
+                <option value="Recovery">Recovery</option>
+                <option value="Lessons Learned">Lessons Learned</option>
+              </select>
+            </div>
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700">Phase</label>
-            <select
-              name="phase"
-              value={newEvent.phase}
-              onChange={handleEventChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-            >
-              <option value="Identification">Identification</option>
-              <option value="Containment">Containment</option>
-              <option value="Eradication">Eradication</option>
-              <option value="Recovery">Recovery</option>
-              <option value="Lessons Learned">Lessons Learned</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">User</label>
+            <label className="block text-sm font-medium text-gray-700">Details (optional)</label>
             <input
               type="text"
-              name="user"
-              value={newEvent.user}
-              onChange={handleEventChange}
-              placeholder="SOC Analyst 1"
+              name="details"
+              value={newEvent.details}
+              onChange={handleEventFieldChange}
+              placeholder="e.g., Isolated VLAN, blocked C2 IP 185.12.x.x; PR notified."
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
             />
           </div>
-          <button
-            type="submit"
-            className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition flex items-center justify-center"
-          >
-            <ClipboardList className="w-5 h-5 mr-2" /> Add to Timeline
-          </button>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Logged by</label>
+              <input
+                type="text"
+                name="user"
+                value={newEvent.user}
+                onChange={handleEventFieldChange}
+                placeholder="SOC Analyst 1"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+              />
+            </div>
+            <div className="flex items-end">
+              <button
+                type="submit"
+                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition flex items-center justify-center"
+              >
+                <ClipboardList className="w-5 h-5 mr-2" /> Add to Timeline
+              </button>
+            </div>
+          </div>
         </form>
+
+        {/* Recent timeline additions preview */}
+        <div className="mt-6">
+          <h4 className="text-lg font-semibold text-gray-800 mb-3">Recent Timeline Entries</h4>
+          <div className="space-y-3">
+            {timelineEvents.slice(-3).reverse().map((e, idx) => (
+              <div key={idx} className="p-3 bg-gray-50 rounded-lg border">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  {e.timestamp} | <span className={`px-2 py-0.5 rounded ${phaseBadge(e.phase)}`}>{e.phase}</span>
+                </p>
+                <p className="font-medium text-gray-800 mt-1">{e.action}</p>
+                <p className="text-xs text-gray-500 mt-1">Logged by: {e.user}</p>
+              </div>
+            ))}
+            {timelineEvents.length === 0 && (
+              <p className="text-sm text-gray-500">No timeline entries yet. Add actions above to build the record.</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Incident Log */}
@@ -991,8 +1114,25 @@ const IncidentBuilderPage = () => {
               <tr key={inc.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{inc.title}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${inc.severity === 'Critical' ? 'bg-red-100 text-red-800' : inc.severity === 'High' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
-                    {
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    inc.severity === 'Critical' ? 'bg-red-100 text-red-800'
+                    : inc.severity === 'High' ? 'bg-orange-100 text-orange-800'
+                    : inc.severity === 'Medium' ? 'bg-yellow-100 text-yellow-800'
+                    : 'bg-green-100 text-green-800'
+                  }`}>
+                    {inc.severity}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inc.asset}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inc.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
 
 // Asset Builder Page
 const AssetBuilderPage = () => {
