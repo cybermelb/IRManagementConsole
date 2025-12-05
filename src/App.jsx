@@ -647,7 +647,7 @@ const DFIRGuidesPage = () => (
   </div>
 );
 
-export default DFIRGuidesPage;
+
 
 
 // Threat Hunting Page
@@ -745,7 +745,7 @@ const ThreatHuntingPage = () => (
   </div>
 );
 
-export default ThreatHuntingPage;
+// export default ThreatHuntingPage;
 
 
 // --- NEW FUNCTIONAL PAGES ---
