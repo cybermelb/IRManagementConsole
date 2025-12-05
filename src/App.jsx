@@ -944,10 +944,10 @@ const ThreatHuntingPage = () => (
 
 const RiskDashboardPage = () => {
   const risks = [
-    { name: "Ransomware", score: 9.5, impact: "High", likelihood: "High", color: "bg-red-500" },
-    { name: "Phishing/BEC", score: 6.0, impact: "Medium", likelihood: "High", color: "bg-orange-500" },
-    { name: "Cloud Misconfig", score: 4.0, impact: "Medium", likelihood: "Medium", color: "bg-yellow-500" },
-    { name: "Insider Threat", score: 2.5, impact: "Low", likelihood: "Low", color: "bg-green-500" },
+    { name: "Ransomware", score: 9.5, trend: "up", color: "bg-red-500" },
+    { name: "Phishing/BEC", score: 6.0, trend: "down", color: "bg-orange-500" },
+    { name: "Cloud Misconfig", score: 4.0, trend: "flat", color: "bg-yellow-500" },
+    { name: "Insider Threat", score: 2.5, trend: "up", color: "bg-green-500" },
   ];
 
   const [timelineEvents, setTimelineEvents] = useState(() => {
@@ -977,6 +977,15 @@ const RiskDashboardPage = () => {
     }
   });
 
+  const [incidents, setIncidents] = useState(() => {
+    try {
+      const saved = localStorage.getItem("incidentLog");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   // 🔹 Dynamic refresh when localStorage changes
   useEffect(() => {
     const handler = () => {
@@ -987,11 +996,41 @@ const RiskDashboardPage = () => {
         if (r) setRemediationTasks(JSON.parse(r));
         const a = localStorage.getItem("criticalAssets");
         if (a) setAssets(JSON.parse(a));
+        const i = localStorage.getItem("incidentLog");
+        if (i) setIncidents(JSON.parse(i));
       } catch {}
     };
     window.addEventListener("storage", handler);
     return () => window.removeEventListener("storage", handler);
   }, []);
+
+  // 🔹 Metrics
+  const openIncidents = incidents.length;
+  const pendingTasks = remediationTasks.filter((t) => t.status === "Pending").length;
+  const completedTasks = remediationTasks.filter((t) => t.status === "Completed").length;
+  const overdueTasks = remediationTasks.filter((t) => t.status === "Overdue").length;
+  const riskPosture = (
+    risks.reduce((acc, r) => acc + r.score, 0) / risks.length
+  ).toFixed(1);
+
+  const getTrendIcon = (trend) => {
+    if (trend === "up") return "▲";
+    if (trend === "down") return "▼";
+    return "▬";
+  };
+
+  const getSeverityBadge = (severity) => {
+    switch (severity) {
+      case "Critical":
+        return "bg-red-600 text-white";
+      case "High":
+        return "bg-orange-500 text-white";
+      case "Medium":
+        return "bg-yellow-400 text-black";
+      default:
+        return "bg-green-500 text-white";
+    }
+  };
 
   return (
     <div className="p-4 space-y-8">
@@ -999,32 +1038,121 @@ const RiskDashboardPage = () => {
         <BarChart3 className="w-7 h-7 mr-2 text-blue-600" /> Risk Dashboard
       </h2>
 
-      {/* Risk Heatmap */}
-      {/* ... unchanged heatmap and risk scores summary ... */}
+      {/* 🔹 Executive Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white p-4 rounded-xl shadow-lg border-t-4 border-blue-500">
+          <p className="text-sm text-gray-500">Open Incidents</p>
+          <p className="text-2xl font-bold text-gray-800">{openIncidents}</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl shadow-lg border-t-4 border-orange-500">
+          <p className="text-sm text-gray-500">Pending Tasks</p>
+          <p className="text-2xl font-bold text-gray-800">{pendingTasks}</p>
+          <p className="text-xs text-gray-400">Completed: {completedTasks}</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl shadow-lg border-t-4 border-red-500">
+          <p className="text-sm text-gray-500">Overdue Tasks</p>
+          <p className="text-2xl font-bold text-gray-800">{overdueTasks}</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl shadow-lg border-t-4 border-green-500">
+          <p className="text-sm text-gray-500">Risk Posture Score</p>
+          <p className="text-2xl font-bold text-gray-800">{riskPosture}</p>
+        </div>
+      </div>
 
-      {/* Linked Data Sections */}
+      {/* 🔹 Risk Heatmap + Top Scores */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Heatmap */}
+        <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-lg border-t-4 border-indigo-500">
+          <h3 className="text-xl font-semibold mb-4 text-indigo-700">Risk Heatmap</h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Current residual risks based on control maturity and threat intelligence.
+          </p>
+          <div className="grid grid-cols-4 grid-rows-4 h-64 border border-gray-200">
+            {/* Y-axis legend */}
+            <div className="col-span-1 flex flex-col justify-around text-xs font-semibold text-gray-600">
+              <span className="text-right pr-2 h-1/4 pt-2">High</span>
+              <span className="text-right pr-2 h-1/4 pt-2">Medium</span>
+              <span className="text-right pr-2 h-1/4 pt-2">Low</span>
+              <span className="text-right pr-2 h-1/4 pt-2">Very Low</span>
+            </div>
+            {/* Risk cells */}
+            <div className="col-span-3 grid grid-cols-3 grid-rows-4">
+              <div className="bg-red-600 text-white flex items-center justify-center font-bold text-xs" style={{ gridRow: 1, gridColumn: 3 }}>Ransomware</div>
+              <div className="bg-yellow-400 text-black flex items-center justify-center font-bold text-xs" style={{ gridRow: 2, gridColumn: 2 }}>Phishing</div>
+              <div className="bg-green-500 flex items-center justify-center text-xs" style={{ gridRow: 3, gridColumn: 1 }}>Insider</div>
+              <div className="bg-orange-400 flex items-center justify-center text-xs" style={{ gridRow: 2, gridColumn: 3 }}>DDoS</div>
+            </div>
+            {/* X-axis legend */}
+            <div className="col-span-1"></div>
+            <div className="col-span-3 flex justify-around text-xs font-semibold text-gray-600 border-t pt-1">
+              <span>Low</span>
+              <span>Medium</span>
+              <span>High</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Top Risk Scores */}
+        <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-pink-500">
+          <h3 className="text-xl font-semibold mb-4 text-pink-700">Top 4 Risk Scores</h3>
+          <div className="space-y-4">
+            {risks.map((r, i) => (
+              <div key={i} className="flex justify-between items-center">
+                <span className="text-gray-700">{r.name}</span>
+                <span className={`px-3 py-1 text-xs font-bold rounded-full text-white ${r.color}`}>
+                  {r.score.toFixed(1)} {getTrendIcon(r.trend)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+            {/* 🔹 Timeline Events */}
       <h3 className="text-2xl font-semibold text-gray-700 mt-6 flex items-center">
         <FileText className="w-5 h-5 mr-2 text-blue-600" /> Recent Timeline Events
       </h3>
       <div className="space-y-3">
         {timelineEvents.slice(-3).reverse().map((event, idx) => (
           <div key={idx} className="p-4 bg-white rounded-lg shadow-md border">
-            <p className="text-xs text-gray-500">{event.timestamp} | {event.phase}</p>
-            <p className="font-semibold text-gray-800">{event.incidentTitle}: {event.action}</p>
+            <p className="text-xs text-gray-500">
+              {event.timestamp} | {event.phase}
+            </p>
+            <p className="font-semibold text-gray-800">
+              {event.incidentTitle}: {event.action}
+            </p>
             <p className="text-xs text-gray-400">Logged by: {event.user}</p>
+            {event.severity && (
+              <span
+                className={`inline-block mt-2 px-2 py-1 text-xs rounded-full ${getSeverityBadge(
+                  event.severity
+                )}`}
+              >
+                {event.severity}
+              </span>
+            )}
           </div>
         ))}
-        {timelineEvents.length === 0 && <p className="text-sm text-gray-500">No timeline events yet.</p>}
+        {timelineEvents.length === 0 && (
+          <p className="text-sm text-gray-500">No timeline events yet.</p>
+        )}
       </div>
 
+      {/* 🔹 Critical Assets */}
       <h3 className="text-2xl font-semibold text-gray-700 mt-6 flex items-center">
         <Cpu className="w-5 h-5 mr-2 text-purple-600" /> Critical Assets
       </h3>
       <div className="space-y-2">
         {assets.length > 0 ? (
           assets.map((asset, idx) => (
-            <div key={idx} className="p-3 bg-white rounded-lg shadow border">
-              <p className="font-semibold text-gray-800">{asset}</p>
+            <div
+              key={idx}
+              className="p-3 bg-white rounded-lg shadow border flex justify-between"
+            >
+              <p className="font-semibold text-gray-800">{asset.name || asset}</p>
+              <span className="text-xs text-gray-500">
+                {asset.classification || "Unclassified"}
+              </span>
             </div>
           ))
         ) : (
@@ -1032,12 +1160,16 @@ const RiskDashboardPage = () => {
         )}
       </div>
 
+      {/* 🔹 Remediation Tasks Overview */}
       <h3 className="text-2xl font-semibold text-gray-700 mt-6 flex items-center">
         <ListTodo className="w-5 h-5 mr-2 text-orange-600" /> Remediation Tasks Overview
       </h3>
       <div className="space-y-3">
         {remediationTasks.slice(-3).reverse().map((task) => (
-          <div key={task.id} className="p-4 bg-white rounded-lg shadow-md border flex justify-between">
+          <div
+            key={task.id}
+            className="p-4 bg-white rounded-lg shadow-md border flex justify-between"
+          >
             <div>
               <p className="font-semibold text-gray-800">{task.title}</p>
               <p className="text-xs text-gray-500">Source: {task.source}</p>
@@ -1049,14 +1181,27 @@ const RiskDashboardPage = () => {
               <span className="ml-2 px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
                 {task.status}
               </span>
+              {task.status === "Overdue" && (
+                <span className="ml-2 px-3 py-1 text-xs font-medium rounded-full bg-red-600 text-white">
+                  Overdue
+                </span>
+              )}
             </div>
           </div>
         ))}
-        {remediationTasks.length === 0 && <p className="text-sm text-gray-500">No remediation tasks yet.</p>}
+        {remediationTasks.length === 0 && (
+          <p className="text-sm text-gray-500">No remediation tasks yet.</p>
+        )}
+        <div className="mt-2 text-xs text-gray-500">
+          Open: {pendingTasks} | Completed: {completedTasks} | Overdue: {overdueTasks}
+        </div>
       </div>
     </div>
   );
 };
+
+
+
 
 
 
