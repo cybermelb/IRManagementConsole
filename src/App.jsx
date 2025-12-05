@@ -348,152 +348,193 @@ const ContactsPage = () => {
 // --- KNOWLEDGE BASE PAGES (ENHANCED) ---
 
 // IR Playbooks Page
+// IR Playbooks Page
+import { AlertTriangle, Search } from "lucide-react"; // ensure lucide-react is installed
+
 const IRPlaybooksPage = () => (
   <div className="p-4 space-y-6">
-    <h2 className="text-3xl font-bold text-gray-800 border-b pb-2">IR Playbooks: Ransomware & Phishing</h2>
+    <h2 className="text-3xl font-bold text-gray-800 border-b pb-2">
+      IR Playbooks: Ransomware & Phishing
+    </h2>
+
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Ransomware Playbook */}
       <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500">
-        <h3 className="text-2xl font-bold text-red-700 flex items-center mb-3"><AlertTriangle className="w-6 h-6 mr-2" /> Ransomware Playbook</h3>
-        
+        <h3 className="text-2xl font-bold text-red-700 flex items-center mb-3">
+          <AlertTriangle className="w-6 h-6 mr-2" /> Ransomware Playbook
+        </h3>
+
         <div className="space-y-4">
           <div className="border-l-4 border-yellow-500 pl-3">
-            <h4 className="font-semibold text-lg text-yellow-800">1. Identification & Initial Triage</h4>
+            <h4 className="font-semibold text-lg text-yellow-800">
+              1. Identification & Initial Triage
+            </h4>
             <ul className="list-disc list-inside text-gray-700 text-sm ml-2">
               <li>Confirm encryption (check file extensions, ransom note presence).</li>
               <li>Identify patient zero / initial access vector.</li>
             </ul>
           </div>
           <div className="border-l-4 border-red-500 pl-3">
-            <h4 className="font-semibold text-lg text-red-800">2. Containment (Stop the Bleeding)</h4>
+            <h4 className="font-semibold text-lg text-red-800">
+              2. Containment (Stop the Bleeding)
+            </h4>
             <ul className="list-disc list-inside text-gray-700 text-sm ml-2">
-              <li>**Short-Term:** Isolate affected host/VLAN from all networks.</li>
-              <li>**Forensic Image:** Create a memory capture and disk image *before* shutdown.</li>
-              <li>**Account Lockout:** Disable/reset credentials potentially compromised.</li>
+              <li><strong>Short-Term:</strong> Isolate affected host/VLAN from all networks.</li>
+              <li><strong>Forensic Image:</strong> Create a memory capture and disk image <em>before</em> shutdown.</li>
+              <li><strong>Account Lockout:</strong> Disable/reset credentials potentially compromised.</li>
             </ul>
           </div>
         </div>
       </div>
-		
-		<div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500">
-        <h3 className="text-2xl font-bold text-red-700 flex items-center mb-3"><AlertTriangle className="w-6 h-6 mr-2" /> The high-impact defense strategies</h3>
-			<div className="space-y-4">
-				<div className="border-l-4 border-yellow-500 pl-3">
-				<table style="height: 231px; width: 633.344px;">
-<tbody>
-<tr>
-<td style="width: 136px;"><strong>Malware Name&nbsp; &nbsp;</strong></td>
-<td style="width: 63px;"><strong> Type &amp; Primary Goal </strong></td>
-<td style="width: 143px;"><strong>Compromise Flow (TTPs: Tactics, Techniques, Procedures) </strong></td>
-<td style="width: 151.344px;"><strong>Critical Mitigation &amp; SOC Strategy</strong></td>
-</tr>
-<tr>
-<td style="width: 136px;">1. BRICKSTORM&nbsp;&nbsp;</td>
-<td style="width: 63px;">RAT / Backdoor / SOCKS Proxy (State Espionage)</td>
-<td style="width: 143px;">
-<p>1. Initial Access (Assumed): Exploitation of a vulnerability leading to the implantation of a Web Shell ([T1505.003]) on a DMZ web server.</p>
-<p>2. Lateral Movement: Used Service Account Credentials ([T1078]) with RDP ([T1021.001]) and SMB to move to domain controllers and the VMware vCenter server.</p>
-<p>3. Credential Theft: Copied the Active Directory database (ntds.dit) ([T1003.003]) to steal credentials (including MSP accounts).</p>
-<p>4. Persistence: Dropped payload in /etc/sysconfig/ and modified the system&rsquo;s init file ([T1037]) to execute BRICKSTORM on boot.</p>
-</td>
-<td style="width: 151.344px;">
-<p>1. Harden DMZ: Strict outbound filtering and mandatory web shell detection (EDR/WAF).</p>
-<p>2. Zero Trust: Enforce strong MFA on all service and MSP accounts; monitor RDP/SMB for suspicious lateral traffic.</p>
-<p>3. Privilege Management: Implement Tiered Access Model; restrict access to the AD database (ntds.dit) to only essential processes.</p>
-<p>4. Host Integrity: File Integrity Monitoring (FIM) on critical configuration files (/etc/sysconfig/init).</p>
-</td>
-</tr>
-<tr>
-<td style="width: 136px;">2. Emotet</td>
-<td style="width: 63px;">Botnet / Banking Trojan (Credential &amp; Payload Delivery)</td>
-<td style="width: 143px;">
-<p>&nbsp;1. Delivery: High-volume Malspam/Phishing containing malicious Office attachments. 2. Execution: User enables macros or opens the file, triggering a PowerShell script to download the main payload.</p>
-<p>3. Persistence: Creates registry keys or scheduled tasks.</p>
-<p>4. Lateral Movement: Drops secondary payloads (e.g., TrickBot) which exploit unpatched vulnerabilities like EternalBlue (SMB) to spread internally.</p>
-</td>
-<td style="width: 151.344px;">
-<p>1. Email Filtering: Block macro-enabled file types and enforce strict filtering for suspicious subjects/senders.</p>
-<p>2. Endpoint Control: Disable macros by default. Implement EDR to block payloads and lateral SMB exploitation.</p>
-<p>3. Network Segmentation: Disable or restrict client-to-client SMB traffic to prevent worm-like internal spread.</p>
-</td>
-</tr>
-<tr>
-<td style="width: 136px;">3.NotPetya</td>
-<td style="width: 63px;">Wiper Malware (Destruction/Sabotage)</td>
-<td style="width: 143px;">
-<p>&nbsp;1. Initial Access: Primarily via supply chain compromise (e.g., corrupted software update).</p>
-<p>2. Lateral Movement: Aggressively spreads using the EternalBlue exploit (SMB) and stolen administrative credentials (PsExec/WMI).</p>
-<p>3. Execution: Modifies the system's Master Boot Record (MBR) and encrypts the Master File Table (MFT).</p>
-<p>4. Impact: Forces a reboot, displays a ransom note, but the encryption is irreversible, resulting in permanent data destruction.</p>
-</td>
-<td style="width: 151.344px;">
-<p>1. Patching: Ensure immediate and universal patching of the MS17-010 (EternalBlue) vulnerability on all Windows endpoints.</p>
-<p>2. Resilience: Maintain immutable, offline, and tested backups&mdash;recovery from data destruction relies solely on this.</p>
-<p>3. Network Control: Segment networks to limit lateral movement; monitor internal SMB traffic for anomalies</p>
-</td>
-</tr>
-<tr>
-<td style="width: 136px;">4. WannaCry</td>
-<td style="width: 63px;">Worm / Ransomware (Extortion)&nbsp;</td>
-<td style="width: 143px;">
-<p>1. Initial Access: Exploits the EternalBlue vulnerability (SMB) on unpatched Windows systems.</p>
-<p>2. Propagation: Acts as a worm, scanning random IP addresses and internal networks for other vulnerable systems to infect. 3. Impact: Encrypts user files, appends .WCRY, and demands ransom.</p>
-<p>4. Fail-Safe: Attempts to connect to a "kill switch" domain; if successful, the malware halts encryption (a feature later used by defenders).</p>
-</td>
-<td style="width: 151.344px;">
-<p>1. Patching: Same as NotPetya: MS17-010 patch is the foundational defense.</p>
-<p>2. Network Segmentation: Block or restrict SMB (port 445) exposure to the internet and between unrelated internal segments.</p>
-<p>3. Antivirus: Ensure all security software is up-to-date to detect the malware and prevent propagation</p>
-</td>
-</tr>
-<tr>
-<td style="width: 136px;">5. TrickBot</td>
-<td style="width: 63px;">Banking Trojan / Modular Malware</td>
-<td style="width: 143px;">
-<p>&nbsp;1. Delivery: Often delivered as a secondary payload by other Trojans (e.g., Emotet) or via phishing.</p>
-<p>2. Credential Theft: Injects code into web browsers to steal banking credentials (via man-in-the-browser).</p>
-<p>3. Lateral Movement: Uses harvested credentials with tools like Mimikatz to move laterally and compromise domain services.</p>
-<p>4. Payload Drop: Downloads and executes subsequent payloads, often leading to ransomware (e.g., Ryuk).</p>
-</td>
-<td style="width: 151.344px;">
-<p>1. Privilege Control: Enforce Least Privilege to minimize the impact of stolen credentials.</p>
-<p>2. Credential Protection: Implement Credential Guard and ensure robust EDR/AV against banking Trojan techniques.</p>
-<p>3. User Training: Focus training on identifying sophisticated phishing that targets financial or administrative staff.</p>
-</td>
-</tr>
-<tr>
-<td style="width: 136px;">6. Stuxnet</td>
-<td style="width: 63px;">Worm / OT (Control System Sabotage)&nbsp;</td>
-<td style="width: 143px;">&nbsp;1. Delivery (Air-Gapped): Spreads via infected USB drives or network shares. 2. Targeting: Scans the infected PC for Siemens Step7/WinCC industrial control software. 3. Execution: Subverts the PLC software to reprogram industrial controllers (e.g., centrifuges). 4. Masking: Uses a rootkit to feed operators false sensor data while the physical machinery is being damaged.</td>
-<td style="width: 151.344px;">
-<p>1. OT Segmentation: Air-gap (physical separation) or strictly isolate Operational Technology (OT) networks from the IT network.</p>
-<p>2. Access Control: Implement strict USB device control policies.</p>
-<p>3. Asset Inventory: Maintain precise inventory and patch levels of all PLCs and SCADA systems.</p>
-<p>4. Monitoring: Implement deep packet inspection (DPI) and anomaly detection specifically for SCADA protocols (Modbus, Profinet).</p>
-</td>
-</tr>
-</tbody>
-</table>
-				</div>
-			</div>
-		  </div>
+
+      {/* High-impact defense strategies with table */}
+      <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500">
+        <h3 className="text-2xl font-bold text-red-700 flex items-center mb-3">
+          <AlertTriangle className="w-6 h-6 mr-2" /> The high-impact defense strategies
+        </h3>
+        <div className="space-y-4">
+          <div className="border-l-4 border-yellow-500 pl-3 overflow-x-auto">
+            <table style={{ width: "100%" }} className="table-auto border-collapse border border-gray-300 text-sm">
+              <tbody>
+                <tr>
+                  <td style={{ width: "136px" }}><strong>Malware Name</strong></td>
+                  <td style={{ width: "63px" }}><strong>Type &amp; Primary Goal</strong></td>
+                  <td style={{ width: "143px" }}><strong>Compromise Flow (TTPs)</strong></td>
+                  <td style={{ width: "151px" }}><strong>Critical Mitigation &amp; SOC Strategy</strong></td>
+                </tr>
+
+                {/* BRICKSTORM */}
+                <tr>
+                  <td>1. BRICKSTORM</td>
+                  <td>RAT / Backdoor / SOCKS Proxy</td>
+                  <td>
+                    <p>1. Initial Access: Vulnerability → Web Shell.</p>
+                    <p>2. Lateral Movement: RDP/SMB with service creds.</p>
+                    <p>3. Credential Theft: Copied AD database.</p>
+                    <p>4. Persistence: Init file executes payload.</p>
+                  </td>
+                  <td>
+                    <p>1. Harden DMZ.</p>
+                    <p>2. Enforce MFA.</p>
+                    <p>3. Restrict AD access.</p>
+                    <p>4. File Integrity Monitoring.</p>
+                  </td>
+                </tr>
+
+                {/* Emotet */}
+                <tr>
+                  <td>2. Emotet</td>
+                  <td>Botnet / Banking Trojan</td>
+                  <td>
+                    <p>1. Delivery: Malspam attachments.</p>
+                    <p>2. Execution: Macros → PowerShell.</p>
+                    <p>3. Persistence: Registry/scheduled tasks.</p>
+                    <p>4. Lateral Movement: Drops TrickBot.</p>
+                  </td>
+                  <td>
+                    <p>1. Email Filtering.</p>
+                    <p>2. Disable macros.</p>
+                    <p>3. Restrict SMB traffic.</p>
+                  </td>
+                </tr>
+
+                {/* NotPetya */}
+                <tr>
+                  <td>3. NotPetya</td>
+                  <td>Wiper Malware</td>
+                  <td>
+                    <p>1. Supply chain compromise.</p>
+                    <p>2. EternalBlue + stolen creds.</p>
+                    <p>3. MBR/MFT encryption.</p>
+                    <p>4. Permanent destruction.</p>
+                  </td>
+                  <td>
+                    <p>1. Patch MS17-010.</p>
+                    <p>2. Immutable backups.</p>
+                    <p>3. Segment networks.</p>
+                  </td>
+                </tr>
+
+                {/* WannaCry */}
+                <tr>
+                  <td>4. WannaCry</td>
+                  <td>Worm / Ransomware</td>
+                  <td>
+                    <p>1. Exploits EternalBlue.</p>
+                    <p>2. Worm propagation.</p>
+                    <p>3. Encrypts files, ransom demand.</p>
+                    <p>4. Kill switch domain halts.</p>
+                  </td>
+                  <td>
+                    <p>1. Patch MS17-010.</p>
+                    <p>2. Block SMB exposure.</p>
+                    <p>3. Update AV.</p>
+                  </td>
+                </tr>
+
+                {/* TrickBot */}
+                <tr>
+                  <td>5. TrickBot</td>
+                  <td>Banking Trojan</td>
+                  <td>
+                    <p>1. Delivered via Emotet/phishing.</p>
+                    <p>2. Browser injection.</p>
+                    <p>3. Lateral movement with stolen creds.</p>
+                    <p>4. Leads to ransomware.</p>
+                  </td>
+                  <td>
+                    <p>1. Least Privilege.</p>
+                    <p>2. Credential Guard.</p>
+                    <p>3. User training.</p>
+                  </td>
+                </tr>
+
+                {/* Stuxnet */}
+                <tr>
+                  <td>6. Stuxnet</td>
+                  <td>Worm / OT Sabotage</td>
+                  <td>
+                    <p>1. Delivery: USB/network shares.</p>
+                    <p>2. Targeting: Siemens Step7/WinCC.</p>
+                    <p>3. Execution: Reprograms PLC controllers.</p>
+                    <p>4. Masking: Rootkit feeds false sensor data.</p>
+                  </td>
+                  <td>
+                    <p>1. OT Segmentation.</p>
+                    <p>2. USB control policies.</p>
+                    <p>3. Asset inventory & patching.</p>
+                    <p>4. SCADA protocol monitoring.</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       {/* Phishing Playbook */}
       <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
-        <h3 className="text-2xl font-bold text-blue-700 flex items-center mb-3"><Search className="w-6 h-6 mr-2" /> Phishing/Credential Theft Playbook</h3>
-        
+        <h3 className="text-2xl font-bold text-blue-700 flex items-center mb-3">
+          <Search className="w-6 h-6 mr-2" /> Phishing/Credential Theft Playbook
+        </h3>
+
         <div className="space-y-4">
           <div className="border-l-4 border-yellow-500 pl-3">
-            <h4 className="font-semibold text-lg text-yellow-800">1. Identification & Analysis</h4>
+            <h4 className="font-semibold text-lg text-yellow-800">
+              1. Identification & Analysis
+            </h4>
             <ul className="list-disc list-inside text-gray-700 text-sm ml-2">
               <li>Check email headers (Sender IP, SPF/DKIM status, return path).</li>
               <li>Analyze malicious attachment/link payload.</li>
             </ul>
           </div>
           <div className="border-l-4 border-red-500 pl-3">
-            <h4 className="font-semibold text-lg text-red-800">2. Containment & Eradication</h4>
+            <h4 className="font-semibold text-lg text-red-800">
+              2. Containment & Eradication
+            </h4>
             <ul className="list-disc list-inside text-gray-700 text-sm ml-2">
-              <li>**Quarantine:** Remove email from all affected inboxes.</li>
-              <li>**Reset:** Force password reset and MFA re-enrollment for compromised accounts.</li>
+              <li><strong>Quarantine:</strong> Remove email from all affected inboxes.</li>
+              <li><strong>Reset:</strong> Force password reset and MFA re-enrollment.</li>
               <li>**Log Hunt:** Search logs for successful logon events from unusual IPs/geos.</li>
             </ul>
           </div>
