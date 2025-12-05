@@ -1399,22 +1399,6 @@ const AssetBuilderPage = () => {
 
 
 // Example initial tasks (you can adjust or import from elsewhere)
-const initialRemediationTasks = [
-  {
-    id: 1,
-    title: "Implement MFA for Marketing Web Server",
-    source: "Post-Incident 2 Review",
-    priority: "High",
-    status: "In Progress",
-  },
-  {
-    id: 2,
-    title: "Schedule forensic training for Tier 1 SOC",
-    source: "Lessons Learned 1",
-    priority: "Medium",
-    status: "Pending",
-  },
-];
 
 const RemediationTasksPage = () => {
   const [tasks, setTasks] = useState(() => {
