@@ -1423,39 +1423,58 @@ const RemediationTasksPage = () => {
 
 
 // Admin Dashboard Page (Placeholder Enhanced)
+
 const AdminDashboardPage = () => {
   const metrics = [
     { title: "Active Users", value: "24", icon: Users, color: "blue" },
     { title: "Rules Updated (30D)", value: "18", icon: Edit2, color: "yellow" },
     { title: "Storage Usage", value: "72%", icon: Database, color: "purple" },
   ];
+
+  const colorClasses = {
+    blue: { border: "border-blue-500", text: "text-blue-500" },
+    yellow: { border: "border-yellow-500", text: "text-yellow-500" },
+    purple: { border: "border-purple-500", text: "text-purple-500" },
+  };
+
   return (
     <div className="p-4 space-y-8">
-      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center"><Shield className="w-7 h-7 mr-2 text-gray-600" /> Admin Dashboard</h2>
+      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
+        <Shield className="w-7 h-7 mr-2 text-gray-600" /> Admin Dashboard
+      </h2>
+
+      {/* Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {metrics.map(card => {
+        {metrics.map((card) => {
           const Icon = card.icon;
+          const colors = colorClasses[card.color];
           return (
-            <div key={card.title} className={`p-5 rounded-xl shadow-lg bg-white border-b-4 border-${card.color}-500`}>
+            <div
+              key={card.title}
+              className={`p-5 rounded-xl shadow-lg bg-white border-b-4 ${colors.border}`}
+            >
               <div className="flex justify-between items-center">
                 <p className="text-sm font-medium text-gray-500">{card.title}</p>
-                <Icon className={`w-5 h-5 text-${card.color}-500`} />
+                <Icon className={`w-5 h-5 ${colors.text}`} />
               </div>
               <p className="text-3xl font-extrabold text-gray-900 mt-1">{card.value}</p>
             </div>
           );
         })}
       </div>
+
+      {/* Audit Log */}
       <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-gray-400">
         <h3 className="text-xl font-semibold mb-4 text-gray-700">Audit Log Summary</h3>
         <p className="text-sm font-mono bg-gray-100 p-3 rounded-lg text-gray-700">
-          [10:05] User Jane S. updated 'Containment' checklist.<br/>
+          [10:05] User Jane S. updated 'Containment' checklist.<br />
           [09:30] System initiated new incident: ID-004.
         </p>
       </div>
     </div>
   );
 };
+
 
 // Settings Page (Placeholder Enhanced)
 const SettingsPage = () => (
