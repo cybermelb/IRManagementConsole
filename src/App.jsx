@@ -331,7 +331,6 @@ const DashboardPage = ({ onSelectIncident, currentIncident }) => {
 
 
 
-
 // Timeline Page
 const TimelinePage = ({ currentIncident, incomingEvents }) => {
   const [events, setEvents] = useState(() => {
@@ -539,7 +538,6 @@ const ContactsPage = () => {
 };
 
 
-// --- KNOWLEDGE BASE PAGES (ENHANCED) ---
 
 // IR Playbooks Page
 
@@ -941,7 +939,6 @@ const ThreatHuntingPage = () => (
 
 
 
-// --- NEW FUNCTIONAL PAGES ---
 
 // Risk Dashboard Page
 const RiskDashboardPage = () => {
@@ -1118,6 +1115,16 @@ const IncidentBuilderPage = ({ assets = [] }) => {
     }
   });
 
+  // 🔹 Load available users/roles from localStorage
+  const [users, setUsers] = useState(() => {
+    try {
+      const saved = localStorage.getItem("incidentUsers");
+      return saved ? JSON.parse(saved) : ["SOC Analyst 1"];
+    } catch {
+      return ["SOC Analyst 1"];
+    }
+  });
+
   const [newEvent, setNewEvent] = useState({
     incidentId: '',
     action: '',
@@ -1249,6 +1256,21 @@ const IncidentBuilderPage = ({ assets = [] }) => {
               />
             </div>
           )}
+
+          {/* 🔹 Logged By Dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Logged By</label>
+            <select
+              name="user"
+              value={newEvent.user}
+              onChange={handleEventFieldChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+            >
+              {users.map((role, idx) => (
+                <option key={idx} value={role}>{role}</option>
+              ))}
+            </select>
+          </div>
 
           <div className="flex space-x-4">
             <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg">Add to Timeline</button>
@@ -1437,6 +1459,39 @@ const AdminDashboardPage = () => {
     purple: { border: "border-purple-500", text: "text-purple-500" },
   };
 
+  const [users, setUsers] = useState(() => {
+    try {
+      const saved = localStorage.getItem("incidentUsers");
+      return saved ? JSON.parse(saved) : [
+        "SOC Analyst 1",
+        "SOC Analyst 2",
+        "Engineer",
+        "Threat Analyst",
+        "Incident Responder",
+        "Security Manager",
+        "Head of Security",
+      ];
+    } catch {
+      return [];
+    }
+  });
+
+  const [newUser, setNewUser] = useState("");
+
+  const handleAddUser = () => {
+    if (!newUser.trim()) return;
+    const updated = [...users, newUser.trim()];
+    setUsers(updated);
+    localStorage.setItem("incidentUsers", JSON.stringify(updated));
+    setNewUser("");
+  };
+
+  const handleDeleteUser = (role) => {
+    const updated = users.filter((u) => u !== role);
+    setUsers(updated);
+    localStorage.setItem("incidentUsers", JSON.stringify(updated));
+  };
+
   return (
     <div className="p-4 space-y-8">
       <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
@@ -1463,17 +1518,47 @@ const AdminDashboardPage = () => {
         })}
       </div>
 
-      {/* Audit Log */}
-      <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-gray-400">
-        <h3 className="text-xl font-semibold mb-4 text-gray-700">Audit Log Summary</h3>
-        <p className="text-sm font-mono bg-gray-100 p-3 rounded-lg text-gray-700">
-          [10:05] User Jane S. updated 'Containment' checklist.<br />
-          [09:30] System initiated new incident: ID-004.
-        </p>
+      {/* User Management */}
+      <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-500">
+        <h3 className="text-xl font-semibold mb-4 text-gray-700 flex items-center">
+          <Users className="w-5 h-5 mr-2 text-green-600" /> Incident Logger Roles
+        </h3>
+        <div className="flex space-x-2 mb-4">
+          <input
+            type="text"
+            value={newUser}
+            onChange={(e) => setNewUser(e.target.value)}
+            placeholder="Add new role (e.g., SOC Analyst 3)"
+            className="flex-grow rounded-md border-gray-300 shadow-sm p-2 border"
+          />
+          <button
+            onClick={handleAddUser}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg flex items-center"
+          >
+            <UserPlus className="w-4 h-4 mr-1" /> Add
+          </button>
+        </div>
+        <div className="space-y-2">
+          {users.map((role, idx) => (
+            <div
+              key={idx}
+              className="flex justify-between items-center p-2 border rounded-lg bg-gray-50"
+            >
+              <span className="text-gray-800">{role}</span>
+              <button
+                onClick={() => handleDeleteUser(role)}
+                className="text-gray-400 hover:text-red-500 transition"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 };
+
 
 
 // Settings Page (Placeholder Enhanced)
