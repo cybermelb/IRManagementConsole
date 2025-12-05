@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Shield, Book, ListChecks, Target, Users, X, CheckCircle, Clock, Search, FolderOpen, 
   AlertTriangle, Cpu, Globe, Zap, Megaphone, Calendar, Phone, Grip, TrendingUp, 
-  FilePlus, ClipboardList, Database, Cog, Settings, LayoutDashboard, Menu, GitFork, 
+  FilePlus, ClipboardList, Database, Cog, Settings, LayoutDashboard, Menu, GitFork, FileText,
   Plus, Trash2, Edit2, BarChart3, Server, Hash, Layers, ListTodo
 } from 'lucide-react';
 
@@ -655,7 +655,7 @@ const DFIRGuidesPage = () => (
 const ThreatHuntingPage = () => (
   <div className="p-4 space-y-6">
     <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
-            Threat Hunting Queries (Persistence & Lateral Movement)
+      Threat Hunting Queries (Persistence & Lateral Movement)
     </h2>
 
     {/* Hunting Queries */}
@@ -745,7 +745,6 @@ const ThreatHuntingPage = () => (
   </div>
 );
 
-// export default ThreatHuntingPage;
 
 
 // --- NEW FUNCTIONAL PAGES ---
