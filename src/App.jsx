@@ -348,7 +348,7 @@ const ContactsPage = () => {
 // --- KNOWLEDGE BASE PAGES (ENHANCED) ---
 
 // IR Playbooks Page
-// IR Playbooks Page
+
 const IRPlaybooksPage = () => (
   <div className="p-4 space-y-6">
     <h2 className="text-3xl font-bold text-gray-800 border-b pb-2">
@@ -543,13 +543,10 @@ const IRPlaybooksPage = () => (
 );
 
 // DFIR Guides Page
-// DFIR Guides Page
-import { FolderOpen, Cpu, Globe, HardDrive, Wifi } from "lucide-react"; // ensure lucide-react is installed
 
 const DFIRGuidesPage = () => (
   <div className="p-4 space-y-6">
     <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
-      <FolderOpen className="w-7 h-7 mr-2 text-indigo-600" />
       DFIR Triage & Artifact Guides (SANS FOR508 / FOR504)
     </h2>
     <p className="text-sm text-gray-600">
@@ -654,13 +651,11 @@ export default DFIRGuidesPage;
 
 
 // Threat Hunting Page
-import { Target, Clock, Users, FileText } from "lucide-react"; // ensure lucide-react is installed
 
 const ThreatHuntingPage = () => (
   <div className="p-4 space-y-6">
     <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
-      <Target className="w-7 h-7 mr-2 text-green-600" />
-      Threat Hunting Queries (Persistence & Lateral Movement)
+            Threat Hunting Queries (Persistence & Lateral Movement)
     </h2>
 
     {/* Hunting Queries */}
