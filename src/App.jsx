@@ -374,34 +374,12 @@ const IRPlaybooksPage = () => (
           </div>
         </div>
       </div>
-
-      {/* Phishing Playbook */}
-      <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
-        <h3 className="text-2xl font-bold text-blue-700 flex items-center mb-3"><Search className="w-6 h-6 mr-2" /> Phishing/Credential Theft Playbook</h3>
-        
-        <div className="space-y-4">
-          <div className="border-l-4 border-yellow-500 pl-3">
-            <h4 className="font-semibold text-lg text-yellow-800">1. Identification & Analysis</h4>
-            <ul className="list-disc list-inside text-gray-700 text-sm ml-2">
-              <li>Check email headers (Sender IP, SPF/DKIM status, return path).</li>
-              <li>Analyze malicious attachment/link payload.</li>
-            </ul>
-          </div>
-          <div className="border-l-4 border-red-500 pl-3">
-            <h4 className="font-semibold text-lg text-red-800">2. Containment & Eradication</h4>
-            <ul className="list-disc list-inside text-gray-700 text-sm ml-2">
-              <li>**Quarantine:** Remove email from all affected inboxes.</li>
-              <li>**Reset:** Force password reset and MFA re-enrollment for compromised accounts.</li>
-              <li>**Log Hunt:** Search logs for successful logon events from unusual IPs/geos.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <p>The high-impact defense strategies</p>
-<table style="height: 231px; width: 633.344px;">
+		
+		<div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500">
+        <h3 className="text-2xl font-bold text-red-700 flex items-center mb-3"><AlertTriangle className="w-6 h-6 mr-2" /> The high-impact defense strategies</h3>
+			<div className="space-y-4">
+				<div className="border-l-4 border-yellow-500 pl-3">
+				<table style="height: 231px; width: 633.344px;">
 <tbody>
 <tr>
 <td style="width: 136px;"><strong>Malware Name&nbsp; &nbsp;</strong></td>
@@ -496,6 +474,32 @@ const IRPlaybooksPage = () => (
 </tr>
 </tbody>
 </table>
+				</div>
+			</div>
+		  </div>
+      {/* Phishing Playbook */}
+      <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
+        <h3 className="text-2xl font-bold text-blue-700 flex items-center mb-3"><Search className="w-6 h-6 mr-2" /> Phishing/Credential Theft Playbook</h3>
+        
+        <div className="space-y-4">
+          <div className="border-l-4 border-yellow-500 pl-3">
+            <h4 className="font-semibold text-lg text-yellow-800">1. Identification & Analysis</h4>
+            <ul className="list-disc list-inside text-gray-700 text-sm ml-2">
+              <li>Check email headers (Sender IP, SPF/DKIM status, return path).</li>
+              <li>Analyze malicious attachment/link payload.</li>
+            </ul>
+          </div>
+          <div className="border-l-4 border-red-500 pl-3">
+            <h4 className="font-semibold text-lg text-red-800">2. Containment & Eradication</h4>
+            <ul className="list-disc list-inside text-gray-700 text-sm ml-2">
+              <li>**Quarantine:** Remove email from all affected inboxes.</li>
+              <li>**Reset:** Force password reset and MFA re-enrollment for compromised accounts.</li>
+              <li>**Log Hunt:** Search logs for successful logon events from unusual IPs/geos.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 );
 
