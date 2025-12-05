@@ -814,6 +814,9 @@ const RiskDashboardPage = () => {
 const IncidentBuilderPage = () => {
   const [newIncident, setNewIncident] = useState({ title: '', severity: 'Medium', asset: '' });
   const [incidentLog, setIncidentLog] = useState(initialScenarios);
+  const [timelineEvents, setTimelineEvents] = useState([]); // store timeline events
+
+  const [newEvent, setNewEvent] = useState({ action: '', phase: 'Identification', user: 'SOC Analyst' });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -836,9 +839,30 @@ const IncidentBuilderPage = () => {
     }
   };
 
+  const handleEventChange = (e) => {
+    const { name, value } = e.target;
+    setNewEvent(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddEvent = (e) => {
+    e.preventDefault();
+    if (newEvent.action) {
+      const newTimelineEntry = {
+        timestamp: new Date().toLocaleTimeString(),
+        action: newEvent.action,
+        phase: newEvent.phase,
+        user: newEvent.user,
+      };
+      setTimelineEvents(prev => [...prev, newTimelineEntry]);
+      setNewEvent({ action: '', phase: 'Identification', user: 'SOC Analyst' });
+    }
+  };
+
   return (
     <div className="p-4 space-y-8">
-      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center"><FilePlus className="w-7 h-7 mr-2 text-green-600" /> Incident Builder (Identification Phase)</h2>
+      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
+        <FilePlus className="w-7 h-7 mr-2 text-green-600" /> Incident Builder (Identification Phase)
+      </h2>
       
       {/* Incident Intake Form */}
       <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-500">
@@ -892,7 +916,65 @@ const IncidentBuilderPage = () => {
         </form>
       </div>
 
-      {/* Incident Log (Previously Active Incidents) */}
+      {/* Incident Response Actions */}
+      <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
+        <h3 className="text-xl font-semibold mb-4">Add Incident Response Action</h3>
+        <form onSubmit={handleAddEvent} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Action</label>
+            <select
+              name="action"
+              value={newEvent.action}
+              onChange={handleEventChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+            >
+              <option value="">Select an action</option>
+              <option value="Alert Received">Alert Received</option>
+              <option value="Triage Initiated">Triage Initiated</option>
+              <option value="Incident Declared">Incident Declared</option>
+              <option value="Technology Team Notified">Technology Team Notified</option>
+              <option value="Cyber Manager Notified">Cyber Manager Notified</option>
+              <option value="Containment Action">Containment Action</option>
+              <option value="Recovery Action">Recovery Action</option>
+              <option value="Legal Counsel Notified">Legal Counsel Notified</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Phase</label>
+            <select
+              name="phase"
+              value={newEvent.phase}
+              onChange={handleEventChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+            >
+              <option value="Identification">Identification</option>
+              <option value="Containment">Containment</option>
+              <option value="Eradication">Eradication</option>
+              <option value="Recovery">Recovery</option>
+              <option value="Lessons Learned">Lessons Learned</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">User</label>
+            <input
+              type="text"
+              name="user"
+              value={newEvent.user}
+              onChange={handleEventChange}
+              placeholder="SOC Analyst 1"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition flex items-center justify-center"
+          >
+            <ClipboardList className="w-5 h-5 mr-2" /> Add to Timeline
+          </button>
+        </form>
+      </div>
+
+      {/* Incident Log */}
       <h3 className="text-2xl font-semibold text-gray-700 mt-6">Incident Initiation Log</h3>
       <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
         <table className="min-w-full divide-y divide-gray-200">
@@ -910,19 +992,7 @@ const IncidentBuilderPage = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{inc.title}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${inc.severity === 'Critical' ? 'bg-red-100 text-red-800' : inc.severity === 'High' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
-                    {inc.severity}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inc.asset}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inc.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-};
+                    {
 
 // Asset Builder Page
 const AssetBuilderPage = () => {
