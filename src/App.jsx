@@ -399,7 +399,7 @@ const IRPlaybooksPage = () => (
       </div>
     </div>
   </div>
-  <div>
+  
   <p>The high-impact defense strategies</p>
 <table style="height: 231px; width: 633.344px;">
 <tbody>
