@@ -349,8 +349,6 @@ const ContactsPage = () => {
 
 // IR Playbooks Page
 // IR Playbooks Page
-import { AlertTriangle, Search } from "lucide-react"; // ensure lucide-react is installed
-
 const IRPlaybooksPage = () => (
   <div className="p-4 space-y-6">
     <h2 className="text-3xl font-bold text-gray-800 border-b pb-2">
