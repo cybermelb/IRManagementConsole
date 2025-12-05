@@ -543,48 +543,106 @@ const IRPlaybooksPage = () => (
 );
 
 // DFIR Guides Page
+// DFIR Guides Page
+import { FolderOpen, Cpu, Globe, HardDrive, Wifi } from "lucide-react"; // ensure lucide-react is installed
+
 const DFIRGuidesPage = () => (
   <div className="p-4 space-y-6">
     <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
       <FolderOpen className="w-7 h-7 mr-2 text-indigo-600" />
-      DFIR Triage & Artifact Guides (SANS FOR508)
+      DFIR Triage & Artifact Guides (SANS FOR508 / FOR504)
     </h2>
-    <p className="text-sm text-gray-600">Guidance on key forensic data points and their purpose during triage.</p>
+    <p className="text-sm text-gray-600">
+      Guidance on key forensic data points and their purpose during triage. Includes host execution artifacts and network communications checks.
+    </p>
+
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Host Artifacts */}
       <div className="bg-white p-5 rounded-xl shadow-md border-t-4 border-purple-500">
-        <p className="font-bold text-xl text-purple-700 flex items-center mb-3"><Cpu className="w-5 h-5 mr-2" /> Host & Execution Artifacts</p>
+        <p className="font-bold text-xl text-purple-700 flex items-center mb-3">
+          <Cpu className="w-5 h-5 mr-2" /> Host & Execution Artifacts
+        </p>
         <div className="space-y-3">
           <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="font-semibold text-gray-800">Windows Event Logs (4688, 7045)</p>
-            <p className="text-xs text-gray-600">Tracks new processes, service installations, and user actions (e.g., failed logons).</p>
+            <p className="font-semibold text-gray-800">Windows Event Logs (4688, 7045, 4624, 4625)</p>
+            <p className="text-xs text-gray-600">
+              Tracks process creation, service installs, and logon successes/failures. Useful for detecting persistence and brute-force attempts.
+            </p>
           </div>
           <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="font-semibold text-gray-800">ShimCache / Prefetch</p>
-            <p className="text-xs text-gray-600">Proves program execution history and the first/last time an executable ran on the system.</p>
+            <p className="font-semibold text-gray-800">ShimCache / Prefetch / Amcache</p>
+            <p className="text-xs text-gray-600">
+              Execution history showing first/last run times. Amcache provides metadata about installed executables.
+            </p>
+          </div>
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <p className="font-semibold text-gray-800">Scheduled Tasks & Services</p>
+            <p className="text-xs text-gray-600">
+              Check for malicious persistence via new tasks (schtasks) or unusual services (Event ID 4697).
+            </p>
+          </div>
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <p className="font-semibold text-gray-800">Registry Keys (Run/RunOnce, UserInit, Winlogon)</p>
+            <p className="text-xs text-gray-600">
+              Common persistence locations. Look for executables outside standard paths (Program Files, System32).
+            </p>
+          </div>
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <p className="font-semibold text-gray-800">Browser Artifacts (History, Cache, Downloads)</p>
+            <p className="text-xs text-gray-600">
+              Identify phishing lure execution, malicious downloads, or suspicious domains accessed by the user.
+            </p>
           </div>
           <div className="bg-gray-50 p-3 rounded-lg">
             <p className="font-semibold text-gray-800">Memory Captures</p>
-            <p className="text-xs text-gray-600">Captures running processes, network connections, and volatile data (e.g., encryption keys or command history). </p>
+            <p className="text-xs text-gray-600">
+              Volatile evidence: running processes, injected code, network sockets, command history, and crypto keys.
+            </p>
           </div>
         </div>
       </div>
-      
+
       {/* Network Artifacts */}
       <div className="bg-white p-5 rounded-xl shadow-md border-t-4 border-teal-500">
-        <p className="font-bold text-xl text-teal-700 flex items-center mb-3"><Globe className="w-5 h-5 mr-2" /> Network & External Comms</p>
+        <p className="font-bold text-xl text-teal-700 flex items-center mb-3">
+          <Globe className="w-5 h-5 mr-2" /> Network & External Comms
+        </p>
         <div className="space-y-3">
           <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="font-semibold text-gray-800">Web Proxies</p>
-            <p className="text-xs text-gray-600">Look for long, unintelligible URLs or older User-Agent strings, often indicative of C2 server connections.</p>
+            <p className="font-semibold text-gray-800">Web Proxies / Firewall Logs</p>
+            <p className="text-xs text-gray-600">
+              Detect suspicious outbound traffic, long URLs, or outdated User-Agent strings indicative of C2 activity.
+            </p>
           </div>
           <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="font-semibold text-gray-800">Netflow Data</p>
-            <p className="text-xs text-gray-600">Hunt for **Beaconing** (repeated, regular connections) and unusually large outbound file transfers (e.g., &gt;20MB).</p>
+            <p className="font-semibold text-gray-800">Netflow / PCAP Analysis</p>
+            <p className="text-xs text-gray-600">
+              Look for beaconing (regular intervals), large outbound transfers, or connections to rare geolocations.
+            </p>
           </div>
           <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="font-semibold text-gray-800">DNS Cache (Int / Ext/Hosts)</p>
-            <p className="text-xs text-gray-600">Reveals look-ups to known bad IP's / domains, helping identify previously unknown impacted hosts.</p>
+            <p className="font-semibold text-gray-800">DNS Cache & Logs</p>
+            <p className="text-xs text-gray-600">
+              Identify lookups to known malicious domains. Cross-reference with OSINT feeds (VirusTotal, AbuseIPDB).
+            </p>
+          </div>
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <p className="font-semibold text-gray-800">Proxy Auto-Config (PAC) & WPAD</p>
+            <p className="text-xs text-gray-600">
+              Malicious PAC/WPAD files can redirect traffic to attacker-controlled proxies. Check system proxy settings.
+            </p>
+          </div>
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <p className="font-semibold text-gray-800">Email Gateway Logs</p>
+            <p className="text-xs text-gray-600">
+              Review for phishing attempts, spoofed sender domains, or malicious attachments. Correlate with SIEM alerts.
+            </p>
+          </div>
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <p className="font-semibold text-gray-800">External Threat Feeds (OSINT)</p>
+            <p className="text-xs text-gray-600">
+              Use feeds like AlienVault OTX, MISP, and SANS ISC Storm Center to enrich indicators and validate suspicious traffic.
+            </p>
           </div>
         </div>
       </div>
@@ -592,28 +650,107 @@ const DFIRGuidesPage = () => (
   </div>
 );
 
+export default DFIRGuidesPage;
+
+
 // Threat Hunting Page
+import { Target, Clock, Users, FileText } from "lucide-react"; // ensure lucide-react is installed
+
 const ThreatHuntingPage = () => (
   <div className="p-4 space-y-6">
     <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
       <Target className="w-7 h-7 mr-2 text-green-600" />
       Threat Hunting Queries (Persistence & Lateral Movement)
     </h2>
+
+    {/* Hunting Queries */}
     <div className="bg-white p-6 rounded-xl shadow-md border-t-2 border-green-400">
-      <h4 className="font-bold text-lg text-gray-800 mb-3 flex items-center"><Clock className="w-4 h-4 mr-2" /> Persistence Artifacts (Autostart Mechanisms)</h4>
-      <p className="text-sm text-gray-600 mb-3">Focus on registry keys that launch processes on user login or system boot outside of standard paths.</p>
+      <h4 className="font-bold text-lg text-gray-800 mb-3 flex items-center">
+        <Clock className="w-4 h-4 mr-2" /> Persistence Artifacts (Autostart Mechanisms)
+      </h4>
+      <p className="text-sm text-gray-600 mb-3">
+        Focus on registry keys that launch processes on user login or system boot outside of standard paths.
+      </p>
       <p className="text-sm font-mono bg-gray-100 p-3 rounded-md text-red-700 overflow-x-auto">
-        `Registry: Run | Path !contains 'Program Files' OR Path !contains 'System32'`
+        Registry: Run | Path !contains 'Program Files' OR Path !contains 'System32'
       </p>
 
-      <h4 className="font-bold text-lg text-gray-800 mb-3 mt-6 flex items-center"><Users className="w-4 h-4 mr-2" /> Lateral Movement (Credential Use)</h4>
-      <p className="text-sm text-gray-600 mb-3">Explicit logon events are often used in credential theft scenarios like Pass-the-Hash (PtH).</p>
-      <p className="text-sm font-mono bg-gray-100 p-3 rounded-md text-red-700 overflow-x-auto">
-        `EventCode=4648` (A logon was attempted using explicit credentials)
+      <h4 className="font-bold text-lg text-gray-800 mb-3 mt-6 flex items-center">
+        <Users className="w-4 h-4 mr-2" /> Lateral Movement (Credential Use)
+      </h4>
+      <p className="text-sm text-gray-600 mb-3">
+        Explicit logon events are often used in credential theft scenarios like Pass-the-Hash (PtH).
       </p>
+      <p className="text-sm font-mono bg-gray-100 p-3 rounded-md text-red-700 overflow-x-auto">
+        EventCode=4648 (A logon was attempted using explicit credentials)
+      </p>
+    </div>
+
+    {/* Threat Intelligence Report Section */}
+    <div className="bg-white p-6 rounded-xl shadow-md border-t-2 border-blue-400">
+      <h3 className="text-2xl font-bold text-blue-700 flex items-center mb-4">
+        <FileText className="w-6 h-6 mr-2" /> Threat & Adversary Mitigation Report
+      </h3>
+
+      <h4 className="font-semibold text-lg text-gray-800 mb-2">Executive Summary</h4>
+      <p className="text-sm text-gray-700 mb-4">
+        Recent intelligence indicates that APT groups (e.g., OceanLotus/APT32) are targeting Australian financial institutions
+        using phishing campaigns and exploiting web application vulnerabilities. Recommended mitigations include enhanced email
+        filtering, vulnerability patching, EDR deployment, and improved network monitoring.
+      </p>
+
+      <h4 className="font-semibold text-lg text-gray-800 mb-2">Priority Intelligence Requirements (PIR)</h4>
+      <table className="table-auto border-collapse border border-gray-300 text-sm mb-4 w-full">
+        <tbody>
+          <tr className="bg-gray-100">
+            <td className="border px-2 py-1 font-bold">PIR ID</td>
+            <td className="border px-2 py-1 font-bold">Intelligence Question</td>
+            <td className="border px-2 py-1 font-bold">Relevance</td>
+          </tr>
+          <tr>
+            <td className="border px-2 py-1">PIR-001</td>
+            <td className="border px-2 py-1">Latest TTPs used by APT groups targeting banking?</td>
+            <td className="border px-2 py-1">Critical for proactive defense.</td>
+          </tr>
+          <tr>
+            <td className="border px-2 py-1">PIR-002</td>
+            <td className="border px-2 py-1">New ransomware campaigns targeting financial institutions?</td>
+            <td className="border px-2 py-1">Essential for risk mitigation.</td>
+          </tr>
+          <tr>
+            <td className="border px-2 py-1">PIR-003</td>
+            <td className="border px-2 py-1">Emerging vulnerabilities in external-facing applications?</td>
+            <td className="border px-2 py-1">Key for patching and reducing attack surface.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4 className="font-semibold text-lg text-gray-800 mb-2">Internal Intelligence Collection</h4>
+      <ul className="list-disc list-inside text-sm text-gray-700 mb-4">
+        <li><strong>SIEM Alerts:</strong> 15 phishing emails detected; blocked and rules updated.</li>
+        <li><strong>EDR Telemetry:</strong> PowerShell execution observed on 3 endpoints; isolated successfully.</li>
+        <li><strong>Email Gateway:</strong> 10% increase in phishing attempts; employee training conducted.</li>
+      </ul>
+
+      <h4 className="font-semibold text-lg text-gray-800 mb-2">External Intelligence Collection</h4>
+      <ul className="list-disc list-inside text-sm text-gray-700 mb-4">
+        <li><strong>Microsoft Defender:</strong> New Locky 2.0 ransomware variant detected.</li>
+        <li><strong>Cisco AIGS:</strong> APT38 (Lazarus) using COVID-19 phishing lures.</li>
+        <li><strong>Dark Web Monitoring:</strong> Planned DDoS attack on banking sector discussed.</li>
+      </ul>
+
+      <h4 className="font-semibold text-lg text-gray-800 mb-2">Recommendations</h4>
+      <ul className="list-disc list-inside text-sm text-gray-700">
+        <li>Enhance email filtering rules to block malicious attachments and URLs.</li>
+        <li>Conduct employee awareness training on phishing and ransomware prevention.</li>
+        <li>Patch external-facing applications to mitigate exploitation risks.</li>
+        <li>Update SIEM/EDR detection rules for new TTPs (e.g., Locky 2.0).</li>
+      </ul>
     </div>
   </div>
 );
+
+export default ThreatHuntingPage;
 
 
 // --- NEW FUNCTIONAL PAGES ---
