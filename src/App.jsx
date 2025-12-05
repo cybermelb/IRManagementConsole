@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Shield, Book, ListChecks, Target, Users, X, CheckCircle, Clock, Search, FolderOpen, 
   AlertTriangle, Cpu, Globe, Zap, Megaphone, Calendar, Phone, Grip, TrendingUp, 
-  FilePlus, ClipboardList, Database, Cog, Settings, LayoutDashboard, Menu, GitFork, FileText, UserPlus, 
+  FilePlus, ClipboardList, Database, Cog, Settings, LayoutDashboard, Menu, GitFork, FileText,
   Plus, Trash2, Edit2, BarChart3, Server, Hash, Layers, ListTodo
 } from 'lucide-react';
 
@@ -142,33 +142,6 @@ const Sidebar = ({ activeTab, setActiveTab, isSidebarOpen, toggleSidebar }) => {
 
 // Dashboard Page (Scenario Selector & Metrics)
 const DashboardPage = ({ onSelectIncident, currentIncident }) => {
-  const [timelineEvents, setTimelineEvents] = useState(() => {
-    try {
-      const saved = localStorage.getItem("timelineEvents");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const [remediationTasks, setRemediationTasks] = useState(() => {
-    try {
-      const saved = localStorage.getItem("remediationTasks");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const [assets, setAssets] = useState(() => {
-    try {
-      const saved = localStorage.getItem("criticalAssets");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
   const metricCards = [
     { title: "Time to Contain (TTC)", value: "3.2 Hours", change: "+5%", icon: Clock, color: "red" },
     { title: "Time to Remediate (TTR)", value: "2 Days", change: "-15%", icon: CheckCircle, color: "green" },
@@ -176,72 +149,51 @@ const DashboardPage = ({ onSelectIncident, currentIncident }) => {
   ];
 
   const getSeverityColor = (severity) => {
-    switch (severity) {
-      case "Critical":
-        return "border-red-500 bg-red-50 text-red-800";
-      case "High":
-        return "border-orange-500 bg-orange-50 text-orange-800";
-      case "Low":
-        return "border-green-500 bg-green-50 text-green-800";
-      default:
-        return "border-gray-300 bg-gray-50 text-gray-800";
+    switch(severity) {
+      case 'Critical': return 'border-red-500 bg-red-50 text-red-800';
+      case 'High': return 'border-orange-500 bg-orange-50 text-orange-800';
+      case 'Low': return 'border-green-500 bg-green-50 text-green-800';
+      default: return 'border-gray-300 bg-gray-50 text-gray-800';
     }
-  };
+  }
 
   return (
     <div className="p-4 space-y-8">
       <h2 className="text-3xl font-bold text-gray-800 border-b pb-2">Active Incident Dashboard</h2>
-
+      
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {metricCards.map((card) => {
+        {metricCards.map(card => {
           const Icon = card.icon;
           return (
-            <div
-              key={card.title}
-              className={`p-5 rounded-xl shadow-lg bg-white border-t-4 border-${card.color}-500`}
-            >
+            <div key={card.title} className={`p-5 rounded-xl shadow-lg bg-white border-t-4 border-${card.color}-500`}>
               <div className="flex justify-between items-center">
                 <p className="text-sm font-medium text-gray-500">{card.title}</p>
                 <Icon className={`w-5 h-5 text-${card.color}-500`} />
               </div>
               <p className="text-3xl font-extrabold text-gray-900 mt-1">{card.value}</p>
               <div className={`mt-2 text-xs font-semibold text-green-600 flex items-center`}>
-                <span className={`text-${card.color}-600`}>{card.change}</span> vs Last Quarter
+                 <span className={`text-${card.color}-600`}>{card.change}</span> vs Last Quarter
               </div>
             </div>
           );
         })}
       </div>
-
+      
       {/* Current Incident Banner */}
-      {currentIncident && (
-        <div
-          className={`p-5 rounded-xl border-l-4 ${getSeverityColor(
-            currentIncident.severity
-          )} shadow-md`}
-        >
-          <p className="font-semibold flex items-center mb-1">
-            <AlertTriangle className="w-5 h-5 mr-2" /> Active Incident:
-          </p>
-          <p className="text-2xl font-bold">{currentIncident.title}</p>
-          <p className="text-sm">
-            Status: <span className="font-semibold">{currentIncident.status}</span> | Severity:{" "}
-            <span className="font-semibold">{currentIncident.severity}</span>
-          </p>
-        </div>
-      )}
+      <div className={`p-5 rounded-xl border-l-4 ${getSeverityColor(currentIncident.severity)} shadow-md`}>
+        <p className="font-semibold flex items-center mb-1"><AlertTriangle className="w-5 h-5 mr-2" /> Active Incident:</p>
+        <p className="text-2xl font-bold">{currentIncident.title}</p>
+        <p className="text-sm">Status: <span className="font-semibold">{currentIncident.status}</span> | Severity: <span className="font-semibold">{currentIncident.severity}</span></p>
+      </div>
 
-      {/* Open Incidents Overview */}
       <h3 className="text-2xl font-semibold text-gray-700 mt-6">Open Incidents Overview</h3>
       <div className="space-y-3">
-        {initialScenarios.map((incident) => (
+        {initialScenarios.map(incident => (
           <div
             key={incident.id}
             className={`flex justify-between items-center p-4 rounded-lg shadow-md transition ${
-              incident.id === currentIncident?.id
-                ? "bg-indigo-100 ring-2 ring-indigo-500"
-                : "bg-white hover:bg-gray-50 cursor-pointer"
+              incident.id === currentIncident.id ? 'bg-indigo-100 ring-2 ring-indigo-500' : 'bg-white hover:bg-gray-50 cursor-pointer'
             }`}
             onClick={() => onSelectIncident(incident)}
           >
@@ -250,86 +202,15 @@ const DashboardPage = ({ onSelectIncident, currentIncident }) => {
               <p className="text-sm text-gray-500">Last Updated: {incident.updated}</p>
             </div>
             <div className="text-right">
-              <span
-                className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                  incident.severity === "Critical"
-                    ? "bg-red-200 text-red-800"
-                    : "bg-green-200 text-green-800"
-                }`}
-              >
-                {incident.severity}
-              </span>
+              <span className={`px-3 py-1 text-xs font-semibold rounded-full ${incident.severity === 'Critical' ? 'bg-red-200 text-red-800' : 'bg-green-200 text-green-800'}`}>{incident.severity}</span>
               <p className="text-sm font-medium mt-1">{incident.status}</p>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Timeline Snapshot */}
-      <h3 className="text-2xl font-semibold text-gray-700 mt-6 flex items-center">
-        <FileText className="w-5 h-5 mr-2 text-blue-600" /> Recent Timeline Events
-      </h3>
-      <div className="space-y-3">
-        {timelineEvents.slice(-3).reverse().map((event, idx) => (
-          <div key={idx} className="p-4 bg-white rounded-lg shadow-md border">
-            <p className="text-xs text-gray-500">
-              {event.timestamp} | {event.phase}
-            </p>
-            <p className="font-semibold text-gray-800">{event.incidentTitle}: {event.action}</p>
-            <p className="text-xs text-gray-400">Logged by: {event.user}</p>
-          </div>
-        ))}
-        {timelineEvents.length === 0 && (
-          <p className="text-sm text-gray-500">No timeline events yet.</p>
-        )}
-      </div>
-
-      {/* Critical Assets Overview */}
-      <h3 className="text-2xl font-semibold text-gray-700 mt-6 flex items-center">
-        <Cpu className="w-5 h-5 mr-2 text-purple-600" /> Critical Assets
-      </h3>
-      <div className="space-y-2">
-        {assets.length > 0 ? (
-          assets.map((asset, idx) => (
-            <div key={idx} className="p-3 bg-white rounded-lg shadow border">
-              <p className="font-semibold text-gray-800">{asset}</p>
-            </div>
-          ))
-        ) : (
-          <p className="text-sm text-gray-500">No critical assets defined yet.</p>
-        )}
-      </div>
-
-      {/* Remediation Tasks Overview */}
-      <h3 className="text-2xl font-semibold text-gray-700 mt-6 flex items-center">
-        <ListTodo className="w-5 h-5 mr-2 text-orange-600" /> Remediation Tasks Overview
-      </h3>
-      <div className="space-y-3">
-        {remediationTasks.slice(-3).reverse().map((task) => (
-          <div key={task.id} className="p-4 bg-white rounded-lg shadow-md border flex justify-between">
-            <div>
-              <p className="font-semibold text-gray-800">{task.title}</p>
-              <p className="text-xs text-gray-500">Source: {task.source}</p>
-            </div>
-            <div className="text-right">
-              <span className="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
-                {task.priority}
-              </span>
-              <span className="ml-2 px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                {task.status}
-              </span>
-            </div>
-          </div>
-        ))}
-        {remediationTasks.length === 0 && (
-          <p className="text-sm text-gray-500">No remediation tasks yet.</p>
-        )}
-      </div>
     </div>
   );
 };
-
-
 
 // Timeline Page
 const TimelinePage = ({ currentIncident, incomingEvents }) => {
@@ -337,7 +218,7 @@ const TimelinePage = ({ currentIncident, incomingEvents }) => {
     // Prefer props if provided; otherwise load from localStorage; fallback to mock
     if (incomingEvents && Array.isArray(incomingEvents) && incomingEvents.length > 0) return incomingEvents;
     try {
-      const saved = localStorage.getItem("timelineEvents");
+      const saved = localStorage.getItem('timelineEvents');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -345,98 +226,63 @@ const TimelinePage = ({ currentIncident, incomingEvents }) => {
     } catch {
       // ignore
     }
-    // Fallback mock data
     return [
-      {
-        timestamp: "10:00 AM (D-0)",
-        incidentTitle: "Prod-Server-01 Ransomware",
-        action: "Alert Received: EDR flagged potential ransomware activity.",
-        phase: "Identification",
-        user: "SOC Analyst 1",
-      },
-      {
-        timestamp: "10:15 AM (D-0)",
-        incidentTitle: "Prod-Server-01 Ransomware",
-        action: "Containment Action: Isolated VLAN; blocked external C2 IPs.",
-        phase: "Containment",
-        user: "IRH John D.",
-      },
-      {
-        timestamp: "11:00 AM (D-0)",
-        incidentTitle: "Prod-Server-01 Ransomware",
-        action: "Legal Counsel notified and engaged.",
-        phase: "Containment",
-        user: "PIH Sarah K.",
-      },
+      { timestamp: '10:00 AM (D-0)', action: 'Alert Received: EDR flagged potential ransomware activity on Prod-Server-01.', phase: 'Identification', user: 'SOC Analyst 1' },
+      { timestamp: '10:15 AM (D-0)', action: 'Containment Action: Isolated Prod-Server-01 VLAN; blocked external C2 IPs.', phase: 'Containment', user: 'IRH John D.' },
+      { timestamp: '11:00 AM (D-0)', action: 'Legal Counsel notified and engaged.', phase: 'Containment', user: 'PIH Sarah K.' },
     ];
   });
 
-  // Listen for broadcasted updates from IncidentBuilderPage
   useEffect(() => {
     const handler = (ev) => {
+      // Optional: respond to broadcasted updates from IncidentBuilderPage
       const detail = ev.detail;
       if (detail && detail.timestamp && detail.action) {
-        setEvents((prev) => [...prev, detail]);
+        setEvents(prev => [...prev, detail]);
       }
     };
-    window.addEventListener("timeline:updated", handler);
-    return () => window.removeEventListener("timeline:updated", handler);
+    window.addEventListener('timeline:updated', handler);
+    return () => window.removeEventListener('timeline:updated', handler);
   }, []);
 
   const getPhaseColor = (phase) => {
     switch (phase) {
-      case "Identification":
-        return "bg-yellow-500";
-      case "Containment":
-        return "bg-red-500";
-      case "Eradication":
-        return "bg-orange-500";
-      case "Recovery":
-        return "bg-blue-500";
-      case "Lessons Learned":
-        return "bg-green-500";
-      default:
-        return "bg-gray-400";
+      case 'Identification': return 'bg-yellow-500';
+      case 'Containment': return 'bg-red-500';
+      case 'Eradication': return 'bg-orange-500';
+      case 'Recovery': return 'bg-blue-500';
+      case 'Lessons Learned': return 'bg-green-500';
+      default: return 'bg-gray-400';
     }
   };
 
   return (
     <div className="p-4 space-y-6">
       <h2 className="text-3xl font-bold text-gray-800 border-b pb-2">
-        Timeline for: {currentIncident?.title || "Current Incident"}
+        Timeline for: {currentIncident?.title || 'Current Incident'}
       </h2>
       <div className="space-y-8 relative before:absolute before:inset-y-0 before:w-1 before:bg-gray-200 before:left-3">
         {events.map((event, index) => (
           <div key={index} className="ml-8 relative">
-            <span
-              className={`absolute -left-10 top-1 w-6 h-6 rounded-full ${getPhaseColor(
-                event.phase
-              )} ring-4 ring-white`}
-            ></span>
+            <span className={`absolute -left-10 top-1 w-6 h-6 rounded-full ${getPhaseColor(event.phase)} ring-4 ring-white`}></span>
             <div className="p-4 bg-white rounded-lg shadow-md border-l-4 border-gray-300">
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
                 {event.timestamp} | {event.phase}
               </p>
-              <p className="font-bold mt-1 text-gray-800">
-                {event.incidentTitle ? `${event.incidentTitle}: ${event.action}` : event.action}
-              </p>
+              <p className="font-bold mt-1 text-gray-800">{event.action}</p>
               <p className="text-xs text-gray-400 mt-1">Logged by: {event.user}</p>
             </div>
           </div>
         ))}
         {events.length === 0 && (
           <div className="ml-8 p-4 bg-white rounded-lg shadow-md border">
-            <p className="text-sm text-gray-600">
-              No timeline events yet. Add actions from the Incident Builder.
-            </p>
+            <p className="text-sm text-gray-600">No timeline events yet. Add actions from the Incident Builder.</p>
           </div>
         )}
       </div>
     </div>
   );
 };
-
-
 
 
 // PICERL Checklists Page
@@ -538,6 +384,7 @@ const ContactsPage = () => {
 };
 
 
+// --- KNOWLEDGE BASE PAGES (ENHANCED) ---
 
 // IR Playbooks Page
 
@@ -939,60 +786,27 @@ const ThreatHuntingPage = () => (
 
 
 
+// --- NEW FUNCTIONAL PAGES ---
 
 // Risk Dashboard Page
 const RiskDashboardPage = () => {
   const risks = [
-    { name: "Ransomware", score: 9.5, impact: "High", likelihood: "High", color: "bg-red-500" },
-    { name: "Phishing/BEC", score: 6.0, impact: "Medium", likelihood: "High", color: "bg-orange-500" },
-    { name: "Cloud Misconfig", score: 4.0, impact: "Medium", likelihood: "Medium", color: "bg-yellow-500" },
-    { name: "Insider Threat", score: 2.5, impact: "Low", likelihood: "Low", color: "bg-green-500" },
+    { name: 'Ransomware', score: 9.5, impact: 'High', likelihood: 'High', color: 'bg-red-500' },
+    { name: 'Phishing/BEC', score: 6.0, impact: 'Medium', likelihood: 'High', color: 'bg-orange-500' },
+    { name: 'Cloud Misconfig', score: 4.0, impact: 'Medium', likelihood: 'Medium', color: 'bg-yellow-500' },
+    { name: 'Insider Threat', score: 2.5, impact: 'Low', likelihood: 'Low', color: 'bg-green-500' },
   ];
-
-  // Load linked data from localStorage (populated by other pages)
-  const [timelineEvents, setTimelineEvents] = useState(() => {
-    try {
-      const saved = localStorage.getItem("timelineEvents");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const [remediationTasks, setRemediationTasks] = useState(() => {
-    try {
-      const saved = localStorage.getItem("remediationTasks");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const [assets, setAssets] = useState(() => {
-    try {
-      const saved = localStorage.getItem("criticalAssets");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
   return (
     <div className="p-4 space-y-8">
-      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
-        <BarChart3 className="w-7 h-7 mr-2 text-blue-600" /> Risk Dashboard
-      </h2>
-
-      {/* Risk Heatmap */}
+      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center"><BarChart3 className="w-7 h-7 mr-2 text-blue-600" /> Risk Dashboard</h2>
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-lg border-t-4 border-indigo-500">
-          <h3 className="text-xl font-semibold mb-4 text-indigo-700">Risk Heatmap</h3>
-          <p className="text-sm text-gray-500 mb-4">
-            Current residual risks based on control maturity and threat intelligence.
-          </p>
+          <h3 className="text-xl font-semibold mb-4 text-indigo-700">Risk Heatmap (Simulated)</h3>
+          <p className="text-sm text-gray-500 mb-4">Current residual risks based on control maturity and threat intelligence.</p>
           {/* Mock Heatmap Grid */}
           <div className="grid grid-cols-4 grid-rows-4 h-64 border border-gray-200">
-            {/* Legend Y-Axis */}
+            {/* Legend Y-Axis (Likelihood) */}
             <div className="col-span-1 flex flex-col justify-around text-xs font-semibold text-gray-600">
               <span className="text-right pr-2 h-1/4 pt-2">High</span>
               <span className="text-right pr-2 h-1/4 pt-2">Medium</span>
@@ -1006,7 +820,7 @@ const RiskDashboardPage = () => {
               <div className="bg-green-500 flex items-center justify-center text-xs" style={{ gridRow: 3, gridColumn: 1 }}>Insider</div>
               <div className="bg-orange-400 flex items-center justify-center text-xs" style={{ gridRow: 2, gridColumn: 3 }}>DDoS</div>
             </div>
-            {/* Legend X-Axis */}
+            {/* Legend X-Axis (Impact) */}
             <div className="col-span-1"></div>
             <div className="col-span-3 flex justify-around text-xs font-semibold text-gray-600 border-t pt-1">
               <span>Low</span>
@@ -1015,7 +829,7 @@ const RiskDashboardPage = () => {
             </div>
           </div>
         </div>
-
+        
         {/* Risk Scores Summary */}
         <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-pink-500">
           <h3 className="text-xl font-semibold mb-4 text-pink-700">Top 4 Risk Scores</h3>
@@ -1024,79 +838,23 @@ const RiskDashboardPage = () => {
               <div key={i} className="flex justify-between items-center">
                 <span className="text-gray-700">{r.name}</span>
                 <div className="flex items-center space-x-2">
-                  <span className={`px-3 py-1 text-xs font-bold rounded-full text-white ${r.color}`}>
-                    {r.score.toFixed(1)}
-                  </span>
+                  <span className={`px-3 py-1 text-xs font-bold rounded-full text-white ${r.color}`}>{r.score.toFixed(1)}</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
-
-      {/* Linked Data Sections */}
-      <h3 className="text-2xl font-semibold text-gray-700 mt-6 flex items-center">
-        <FileText className="w-5 h-5 mr-2 text-blue-600" /> Recent Timeline Events
-      </h3>
-      <div className="space-y-3">
-        {timelineEvents.slice(-3).reverse().map((event, idx) => (
-          <div key={idx} className="p-4 bg-white rounded-lg shadow-md border">
-            <p className="text-xs text-gray-500">{event.timestamp} | {event.phase}</p>
-            <p className="font-semibold text-gray-800">{event.incidentTitle}: {event.action}</p>
-            <p className="text-xs text-gray-400">Logged by: {event.user}</p>
-          </div>
-        ))}
-        {timelineEvents.length === 0 && <p className="text-sm text-gray-500">No timeline events yet.</p>}
-      </div>
-
-      <h3 className="text-2xl font-semibold text-gray-700 mt-6 flex items-center">
-        <Cpu className="w-5 h-5 mr-2 text-purple-600" /> Critical Assets
-      </h3>
-      <div className="space-y-2">
-        {assets.length > 0 ? (
-          assets.map((asset, idx) => (
-            <div key={idx} className="p-3 bg-white rounded-lg shadow border">
-              <p className="font-semibold text-gray-800">{asset}</p>
-            </div>
-          ))
-        ) : (
-          <p className="text-sm text-gray-500">No critical assets defined yet.</p>
-        )}
-      </div>
-
-      <h3 className="text-2xl font-semibold text-gray-700 mt-6 flex items-center">
-        <ListTodo className="w-5 h-5 mr-2 text-orange-600" /> Remediation Tasks Overview
-      </h3>
-      <div className="space-y-3">
-        {remediationTasks.slice(-3).reverse().map((task) => (
-          <div key={task.id} className="p-4 bg-white rounded-lg shadow-md border flex justify-between">
-            <div>
-              <p className="font-semibold text-gray-800">{task.title}</p>
-              <p className="text-xs text-gray-500">Source: {task.source}</p>
-            </div>
-            <div className="text-right">
-              <span className="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
-                {task.priority}
-              </span>
-              <span className="ml-2 px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                {task.status}
-              </span>
-            </div>
-          </div>
-        ))}
-        {remediationTasks.length === 0 && <p className="text-sm text-gray-500">No remediation tasks yet.</p>}
-      </div>
     </div>
   );
 };
 
-
-
 // Incident Builder Page
-const IncidentBuilderPage = ({ assets = [] }) => {
+const IncidentBuilderPage = () => {
   const [newIncident, setNewIncident] = useState({ title: '', severity: 'Medium', asset: '' });
   const [incidentLog, setIncidentLog] = useState(initialScenarios);
 
+  // Timeline events persisted so TimelinePage can read them
   const [timelineEvents, setTimelineEvents] = useState(() => {
     try {
       const saved = localStorage.getItem('timelineEvents');
@@ -1106,31 +864,11 @@ const IncidentBuilderPage = ({ assets = [] }) => {
     }
   });
 
-  const [remediationTasks, setRemediationTasks] = useState(() => {
-    try {
-      const saved = localStorage.getItem('remediationTasks');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  // 🔹 Load available users/roles from localStorage
-  const [users, setUsers] = useState(() => {
-    try {
-      const saved = localStorage.getItem("incidentUsers");
-      return saved ? JSON.parse(saved) : ["SOC Analyst 1"];
-    } catch {
-      return ["SOC Analyst 1"];
-    }
-  });
-
+  // Form state for adding timeline actions
   const [newEvent, setNewEvent] = useState({
-    incidentId: '',
     action: '',
     details: '',
     phase: 'Identification',
-    remediation: '',
     user: 'SOC Analyst 1',
   });
 
@@ -1141,14 +879,14 @@ const IncidentBuilderPage = ({ assets = [] }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newIncident.title.trim()) {
+    if (newIncident.title.trim().length > 0) {
       const newEntry = {
         id: incidentLog.length + 1,
         title: newIncident.title.trim(),
         status: 'Identified',
         severity: newIncident.severity,
         updated: new Date().toLocaleTimeString(),
-        asset: newIncident.asset || 'N/A',
+        asset: newIncident.asset?.trim() || 'N/A',
       };
       setIncidentLog(prev => [newEntry, ...prev]);
       setNewIncident({ title: '', severity: 'Medium', asset: '' });
@@ -1162,131 +900,239 @@ const IncidentBuilderPage = ({ assets = [] }) => {
 
   const handleAddEvent = (e) => {
     e.preventDefault();
-    if (!newEvent.action || !newEvent.incidentId) return;
+    if (!newEvent.action) return;
 
-    const incident = incidentLog.find(i => i.id === parseInt(newEvent.incidentId));
-    if (!incident) return;
+    const timestamp = new Date().toLocaleTimeString();
+    const actionText =
+      newEvent.details && newEvent.details.trim().length > 0
+        ? `${newEvent.action}: ${newEvent.details.trim()}`
+        : newEvent.action;
 
     const entry = {
-      timestamp: new Date().toLocaleTimeString(),
-      incidentTitle: incident.title,
-      action: newEvent.details ? `${newEvent.action}: ${newEvent.details}` : newEvent.action,
+      timestamp,
+      action: actionText,
       phase: newEvent.phase,
-      user: newEvent.user,
+      user: newEvent.user?.trim() || 'SOC Analyst 1',
     };
 
     const updated = [...timelineEvents, entry];
     setTimelineEvents(updated);
-    localStorage.setItem('timelineEvents', JSON.stringify(updated));
-    window.dispatchEvent(new CustomEvent('timeline:updated', { detail: entry }));
+    try {
+      localStorage.setItem('timelineEvents', JSON.stringify(updated));
+      // Optional: broadcast to other parts of the app
+      window.dispatchEvent(new CustomEvent('timeline:updated', { detail: entry }));
+    } catch {
+      // Ignore storage errors
+    }
 
-    setNewEvent({ incidentId: '', action: '', details: '', phase: 'Identification', remediation: '', user: 'SOC Analyst 1' });
+    setNewEvent({ action: '', details: '', phase: 'Identification', user: 'SOC Analyst 1' });
   };
 
-  const handleAddRemediation = () => {
-    if (!newEvent.remediation || !newEvent.incidentId) return;
-    const incident = incidentLog.find(i => i.id === parseInt(newEvent.incidentId));
-    if (!incident) return;
-
-    const newTask = {
-      id: remediationTasks.length + 1,
-      title: newEvent.remediation,
-      source: `${newEvent.phase} Phase - ${incident.title}`,
-      priority: 'High',
-      status: 'Pending',
-    };
-
-    const updated = [...remediationTasks, newTask];
-    setRemediationTasks(updated);
-    localStorage.setItem('remediationTasks', JSON.stringify(updated));
-    window.dispatchEvent(new CustomEvent('remediation:updated', { detail: newTask }));
-
-    setNewEvent(prev => ({ ...prev, remediation: '' }));
+  const phaseBadge = (phase) => {
+    switch (phase) {
+      case 'Identification': return 'bg-yellow-100 text-yellow-800';
+      case 'Containment': return 'bg-red-100 text-red-800';
+      case 'Eradication': return 'bg-orange-100 text-orange-800';
+      case 'Recovery': return 'bg-blue-100 text-blue-800';
+      case 'Lessons Learned': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
-
-  const remediationOptions = [
-    'Implement MFA across critical systems',
-    'Patch vulnerable servers/applications',
-    'Conduct forensic training for SOC',
-    'Update incident response playbooks',
-    'Improve backup and recovery procedures',
-    'Enhance monitoring for lateral movement',
-    'Restrict privileged account usage',
-    'Conduct Lessons Learned workshop',
-  ];
-
-  const showRemediation = ['Containment', 'Eradication', 'Recovery', 'Lessons Learned'].includes(newEvent.phase);
 
   return (
     <div className="p-4 space-y-8">
       <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
-        <FilePlus className="w-7 h-7 mr-2 text-green-600" /> Incident Builder
+        <FilePlus className="w-7 h-7 mr-2 text-green-600" /> Incident Builder (Identification Phase)
       </h2>
-
+      
       {/* Incident Intake Form */}
-      {/* ... same as before ... */}
-
-      {/* Add Incident Response Action */}
-      <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
-        <h3 className="text-xl font-semibold mb-4">Add Incident Response Action</h3>
-        <form onSubmit={handleAddEvent} className="space-y-4">
-          {/* Incident selection, action, details, phase fields ... */}
-
-          {showRemediation && (
+      <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-500">
+        <h3 className="text-xl font-semibold mb-4">Log New Incident</h3>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Incident Title / Brief Summary</label>
+            <input
+              type="text"
+              name="title"
+              value={newIncident.title}
+              onChange={handleChange}
+              placeholder="e.g., EDR Alert: Suspicious file execution on Server-12"
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Remediation Task</label>
+              <label className="block text-sm font-medium text-gray-700">Initial Severity</label>
               <select
-                name="remediation"
-                value={newEvent.remediation}
+                name="severity"
+                value={newIncident.severity}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Affected Asset</label>
+              <input
+                type="text"
+                name="asset"
+                value={newIncident.asset}
+                onChange={handleChange}
+                placeholder="Prod-Server-01"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+              />
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition flex items-center justify-center"
+          >
+            <Zap className="w-5 h-5 mr-2" /> Start Incident Response
+          </button>
+        </form>
+      </div>
+
+      {/* Incident Response Actions -> Auto to Timeline */}
+      <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
+        <h3 className="text-xl font-semibold mb-4">Add Incident Response Action (auto-appends to Timeline)</h3>
+        <form onSubmit={handleAddEvent} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Action</label>
+              <select
+                name="action"
+                value={newEvent.action}
                 onChange={handleEventFieldChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
               >
-                <option value="">Select or enter task</option>
-                {remediationOptions.map((opt, idx) => (
-                  <option key={idx} value={opt}>{opt}</option>
-                ))}
+                <option value="">Select an action</option>
+                <option value="Alert Received">Alert Received</option>
+                <option value="Triage Initiated">Triage Initiated</option>
+                <option value="Incident Declared">Incident Declared</option>
+                <option value="Technology Team Notified">Technology Team Notified</option>
+                <option value="Cyber Manager Notified">Cyber Manager Notified</option>
+                <option value="Containment Action">Containment Action</option>
+                <option value="Eradication Action">Eradication Action</option>
+                <option value="Recovery Action">Recovery Action</option>
+                <option value="Legal Counsel Notified">Legal Counsel Notified</option>
+                <option value="Communications/PR Notified">Communications/PR Notified</option>
+                <option value="Regulator Notified">Regulator Notified</option>
+                <option value="Lessons Learned Workshop Scheduled">Lessons Learned Workshop Scheduled</option>
               </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Phase</label>
+              <select
+                name="phase"
+                value={newEvent.phase}
+                onChange={handleEventFieldChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+              >
+                <option value="Identification">Identification</option>
+                <option value="Containment">Containment</option>
+                <option value="Eradication">Eradication</option>
+                <option value="Recovery">Recovery</option>
+                <option value="Lessons Learned">Lessons Learned</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Details (optional)</label>
+            <input
+              type="text"
+              name="details"
+              value={newEvent.details}
+              onChange={handleEventFieldChange}
+              placeholder="e.g., Isolated VLAN, blocked C2 IP 185.12.x.x; PR notified."
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Logged by</label>
               <input
                 type="text"
-                name="remediation"
-                value={newEvent.remediation}
+                name="user"
+                value={newEvent.user}
                 onChange={handleEventFieldChange}
-                placeholder="Or enter manually"
-                className="mt-2 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                placeholder="SOC Analyst 1"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
               />
             </div>
-          )}
-
-          {/* 🔹 Logged By Dropdown */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Logged By</label>
-            <select
-              name="user"
-              value={newEvent.user}
-              onChange={handleEventFieldChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-            >
-              {users.map((role, idx) => (
-                <option key={idx} value={role}>{role}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex space-x-4">
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg">Add to Timeline</button>
-            {showRemediation && (
-              <button type="button" onClick={handleAddRemediation} className="px-4 py-2 bg-orange-600 text-white rounded-lg">
-                Add Remediation Task
+            <div className="flex items-end">
+              <button
+                type="submit"
+                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition flex items-center justify-center"
+              >
+                <ClipboardList className="w-5 h-5 mr-2" /> Add to Timeline
               </button>
-            )}
+            </div>
           </div>
         </form>
+
+        {/* Recent timeline additions preview */}
+        <div className="mt-6">
+          <h4 className="text-lg font-semibold text-gray-800 mb-3">Recent Timeline Entries</h4>
+          <div className="space-y-3">
+            {timelineEvents.slice(-3).reverse().map((e, idx) => (
+              <div key={idx} className="p-3 bg-gray-50 rounded-lg border">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  {e.timestamp} | <span className={`px-2 py-0.5 rounded ${phaseBadge(e.phase)}`}>{e.phase}</span>
+                </p>
+                <p className="font-medium text-gray-800 mt-1">{e.action}</p>
+                <p className="text-xs text-gray-500 mt-1">Logged by: {e.user}</p>
+              </div>
+            ))}
+            {timelineEvents.length === 0 && (
+              <p className="text-sm text-gray-500">No timeline entries yet. Add actions above to build the record.</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Incident Log */}
+      <h3 className="text-2xl font-semibold text-gray-700 mt-6">Incident Initiation Log</h3>
+      <div className="overflow-x-auto bg-white rounded-xl shadow-lg">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severity</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {incidentLog.map((inc) => (
+              <tr key={inc.id}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{inc.title}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    inc.severity === 'Critical' ? 'bg-red-100 text-red-800'
+                    : inc.severity === 'High' ? 'bg-orange-100 text-orange-800'
+                    : inc.severity === 'Medium' ? 'bg-yellow-100 text-yellow-800'
+                    : 'bg-green-100 text-green-800'
+                  }`}>
+                    {inc.severity}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inc.asset}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{inc.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 };
-
-
 
 // Asset Builder Page
 const AssetBuilderPage = () => {
@@ -1397,92 +1243,48 @@ const AssetBuilderPage = () => {
   );
 };
 
-
-// Example initial tasks (you can adjust or import from elsewhere)
-
+// Remediation Tasks Page
 const RemediationTasksPage = () => {
-  const [tasks, setTasks] = useState(() => {
-    try {
-      const saved = localStorage.getItem("remediationTasks");
-      return saved ? JSON.parse(saved) : initialRemediationTasks;
-    } catch {
-      return initialRemediationTasks;
-    }
-  });
+  const [tasks, setTasks] = useState(initialRemediationTasks);
 
   const getPriorityStyle = (priority) => {
-    if (priority === "High") return "text-red-600 bg-red-100";
-    if (priority === "Medium") return "text-orange-600 bg-orange-100";
-    return "text-green-600 bg-green-100";
+    if (priority === 'High') return 'text-red-600 bg-red-100';
+    if (priority === 'Medium') return 'text-orange-600 bg-orange-100';
+    return 'text-green-600 bg-green-100';
   };
 
   const getStatusStyle = (status) => {
-    if (status === "In Progress") return "text-blue-600 bg-blue-100";
-    if (status === "Pending") return "text-gray-600 bg-gray-100";
-    return "text-green-600 bg-green-100";
-  };
-
-  const handleDelete = (id) => {
-    const updated = tasks.filter((t) => t.id !== id);
-    setTasks(updated);
-    localStorage.setItem("remediationTasks", JSON.stringify(updated));
+    if (status === 'In Progress') return 'text-blue-600 bg-blue-100';
+    if (status === 'Pending') return 'text-gray-600 bg-gray-100';
+    return 'text-green-600 bg-green-100';
   };
 
   return (
     <div className="p-4 space-y-8">
-      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
-        <ListTodo className="w-7 h-7 mr-2 text-orange-600" /> Remediation Tasks
-      </h2>
+      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center"><ListTodo className="w-7 h-7 mr-2 text-orange-600" /> Remediation Tasks (Lessons Learned Phase)</h2>
       <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-orange-500">
         <h3 className="text-xl font-semibold mb-4">Open Remediation Items</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Security gaps identified during or after incident handling must be tracked here to ensure system resilience.
-        </p>
+        <p className="text-sm text-gray-600 mb-4">Security gaps identified during or after incident handling must be tracked here to ensure system resilience.</p>
+        
         <div className="space-y-4">
-          {tasks.map((task) => (
-            <div
-              key={task.id}
-              className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50 transition"
-            >
+          {tasks.map(task => (
+            <div key={task.id} className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50 transition">
               <div className="flex-grow">
                 <p className="font-semibold text-gray-800">{task.title}</p>
                 <p className="text-xs text-gray-500 mt-1">Source: {task.source}</p>
               </div>
               <div className="flex items-center space-x-3">
-                <span
-                  className={`px-3 py-1 text-xs font-medium rounded-full ${getPriorityStyle(
-                    task.priority
-                  )}`}
-                >
-                  {task.priority}
-                </span>
-                <span
-                  className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusStyle(
-                    task.status
-                  )}`}
-                >
-                  {task.status}
-                </span>
-                <button
-                  onClick={() => handleDelete(task.id)}
-                  className="text-gray-400 hover:text-red-500 transition"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <span className={`px-3 py-1 text-xs font-medium rounded-full ${getPriorityStyle(task.priority)}`}>{task.priority}</span>
+                <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusStyle(task.status)}`}>{task.status}</span>
+                <button className="text-gray-400 hover:text-red-500 transition"><Trash2 className="w-4 h-4" /></button>
               </div>
             </div>
           ))}
-          {tasks.length === 0 && (
-            <p className="text-sm text-gray-500">No remediation tasks available.</p>
-          )}
         </div>
       </div>
     </div>
   );
 };
-
-
-
 
 // Admin Dashboard Page (Placeholder Enhanced)
 const AdminDashboardPage = () => {
@@ -1491,58 +1293,33 @@ const AdminDashboardPage = () => {
     { title: "Rules Updated (30D)", value: "18", icon: Edit2, color: "yellow" },
     { title: "Storage Usage", value: "72%", icon: Database, color: "purple" },
   ];
-
-  const colorClasses = {
-    blue: { border: "border-blue-500", text: "text-blue-500" },
-    yellow: { border: "border-yellow-500", text: "text-yellow-500" },
-    purple: { border: "border-purple-500", text: "text-purple-500" },
-  };
-
-  const [users, setUsers] = useState(() => {
-    try {
-      const saved = localStorage.getItem("incidentUsers");
-      return saved
-        ? JSON.parse(saved)
-        : [
-            "SOC Analyst 1",
-            "SOC Analyst 2",
-            "Engineer",
-            "Threat Analyst",
-            "Incident Responder",
-            "Security Manager",
-            "Head of Security",
-          ];
-    } catch {
-      return [];
-    }
-  });
-
-  const [newUser, setNewUser] = useState("");
-
-  const handleAddUser = () => {
-    if (!newUser.trim()) return;
-    const updated = [...users, newUser.trim()];
-    setUsers(updated);
-    localStorage.setItem("incidentUsers", JSON.stringify(updated));
-    setNewUser("");
-  };
-
-  const handleDeleteUser = (role) => {
-    const updated = users.filter((u) => u !== role);
-    setUsers(updated);
-    localStorage.setItem("incidentUsers", JSON.stringify(updated));
-  };
-
   return (
     <div className="p-4 space-y-8">
-      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center">
-        <Shield className="w-7 h-7 mr-2 text-gray-600" /> Admin Dashboard
-      </h2>
-      {/* …rest of your JSX unchanged… */}
+      <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 flex items-center"><Shield className="w-7 h-7 mr-2 text-gray-600" /> Admin Dashboard</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {metrics.map(card => {
+          const Icon = card.icon;
+          return (
+            <div key={card.title} className={`p-5 rounded-xl shadow-lg bg-white border-b-4 border-${card.color}-500`}>
+              <div className="flex justify-between items-center">
+                <p className="text-sm font-medium text-gray-500">{card.title}</p>
+                <Icon className={`w-5 h-5 text-${card.color}-500`} />
+              </div>
+              <p className="text-3xl font-extrabold text-gray-900 mt-1">{card.value}</p>
+            </div>
+          );
+        })}
+      </div>
+      <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-gray-400">
+        <h3 className="text-xl font-semibold mb-4 text-gray-700">Audit Log Summary</h3>
+        <p className="text-sm font-mono bg-gray-100 p-3 rounded-lg text-gray-700">
+          [10:05] User Jane S. updated 'Containment' checklist.<br/>
+          [09:30] System initiated new incident: ID-004.
+        </p>
+      </div>
     </div>
   );
 };
-
 
 // Settings Page (Placeholder Enhanced)
 const SettingsPage = () => (
